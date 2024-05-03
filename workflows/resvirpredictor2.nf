@@ -4,26 +4,30 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-validation'
-include { FASTP					 } from '../modules/nf-core/fastp/main'
-include { UNICYCLER				 } from '../modules/nf-core/unicycler/main'
-include { QUAST					 } from '../modules/nf-core/quast/main'
-include { ARIBA_GETREF			 } from '../modules/nf-core/ariba/getref/main'
-include { ARIBA_RUN				 } from '../modules/nf-core/ariba/run/main'
-include { PLASMIDID				 } from '../modules/nf-core/plasmidid/main'
-include { SNIPPY_RUN			 } from '../modules/nf-core/snippy/run/main'
-include { SNIPPY_CORE			 } from '../modules/nf-core/snippy/core/main'
-include { IQTREE				 } from '../modules/nf-core/iqtree/main'
-include { MLST					 } from '../modules/nf-core/mlst/main'
-include { SPATYPER				 } from '../modules/nf-core/spatyper/main'
-include { STAPHOPIASCCMEC		 } from '../modules/nf-core/staphopiasccmec/main'
-include { MYKROBE_PREDICT		 } from '../modules/nf-core/mykrobe/predict/main'
-include { FASTQ_TRIM_FASTP_FASTQC } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { FASTQC                 		} from '../modules/nf-core/fastqc/main'
+include { FASTP					        } from '../modules/nf-core/fastp/main'
+include { UNICYCLER			 	        } from '../modules/nf-core/unicycler/main'
+include { QUAST				 	        } from '../modules/nf-core/quast/main'
+include { ARIBA_GETREF			 	    } from '../modules/nf-core/ariba/getref/main'
+include { ARIBA_RUN				        } from '../modules/nf-core/ariba/run/main'
+include { PLASMIDID				        } from '../modules/nf-core/plasmidid/main'
+include { NCBIGENOMEDOWNLOAD 			} from '../modules/nf-core/ncbigenomedownload/main'
+include { SNIPPY_RUN			 	    } from '../modules/nf-core/snippy/run/main'
+include { SNIPPY_CORE			 	    } from '../modules/nf-core/snippy/core/main'
+include { IQTREE				        } from '../modules/nf-core/iqtree/main'
+include { MLST					        } from '../modules/nf-core/mlst/main'
+include { SPATYPER				        } from '../modules/nf-core/spatyper/main'
+include { STAPHOPIASCCMEC		 	    } from '../modules/nf-core/staphopiasccmec/main'
+include { MYKROBE_PREDICT		 	    } from '../modules/nf-core/mykrobe/predict/main'
+
+
+
+include { MULTIQC                		} from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap       		} from 'plugin/nf-validation'
+include { FASTQ_TRIM_FASTP_FASTQC 		} from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
+include { paramsSummaryMultiqc   		} from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML 		} from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText 		} from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,7 +35,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_resv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow RESVIRPREDICTOR {
+workflow RESVIRPREDICTORALEX {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
@@ -49,6 +53,18 @@ workflow RESVIRPREDICTOR {
     )
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+
+    //
+    // MODULE: Run FastP
+    //
+    FASTP (
+        ch_samplesheet
+    )
+
+
+
+
+/*
 
     //
     // Collate and save software versions
@@ -81,6 +97,13 @@ workflow RESVIRPREDICTOR {
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
+
+
+
+
+
+
+    */
 }
 
 /*

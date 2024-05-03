@@ -22,7 +22,7 @@ include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_resv
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
 
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
-
+include { RESVIRPREDICTORALEX     } from './workflows/resviroredictor2'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     GENOME PARAMETER VALUES
@@ -43,6 +43,8 @@ params.fasta = getGenomeAttribute('fasta')
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
+
+/*
 workflow NFCORE_RESVIRPREDICTOR {
 
     take:
@@ -59,6 +61,22 @@ workflow NFCORE_RESVIRPREDICTOR {
 
     emit:
     multiqc_report = RESVIRPREDICTOR.out.multiqc_report // channel: /path/to/multiqc_report.html
+
+}
+*/
+workflow NFCORE_RESVIRPREDICTOR {
+
+    take:
+    samplesheet // channel: samplesheet read in from --input
+
+    main:
+
+    //
+    // WORKFLOW: Run pipeline
+    //
+    RESVIRPREDICTORALEX (
+        samplesheet
+    )
 
 }
 /*
