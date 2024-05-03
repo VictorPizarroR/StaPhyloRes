@@ -22,7 +22,7 @@ include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_resv
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
 
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
-include { RESVIRPREDICTORALEX     } from './workflows/resviroredictor2'
+include { RESVIRPREDICTORALEX } from './workflows/resvirpredictor2'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     GENOME PARAMETER VALUES
