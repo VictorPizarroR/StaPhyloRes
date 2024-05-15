@@ -140,12 +140,7 @@
                     "description": "Skip all Ariba database analysis.",
                     "fa_icon": "fas fa-forward"
                 }
-            },
-            "required": [
-                "vfdb_core_enabled",
-                "plasmidfinder_enabled",
-                "resfinder_enabled"
-            ]
+            }
         },
         "reference_genome_options": {
             "title": "Reference genome options",
