@@ -39,8 +39,8 @@ workflow RESVIRPREDICTOR {
     main:
 
     ch_versions = Channel.empty()
-    ch_versions_p = Channel.empty()
     ch_multiqc_files = Channel.empty()
+
 
     //
     // MODULE: Run FastQC
@@ -57,23 +57,49 @@ workflow RESVIRPREDICTOR {
     FASTP (
         ch_samplesheet,
         [],
-        false,
+        true,
         false
     )
-    trim_reads            = FASTP.out.reads
-        trim_json         = FASTP.out.json
-        trim_html         = FASTP.out.html
-        trim_log          = FASTP.out.log
-        trim_reads_fail   = FASTP.out.reads_fail
-        trim_reads_merged = FASTP.out.reads_merged
-        ch_versions_p     = ch_versions_p.mix(FASTP.out.versions.first())
+    //trim_reads_fail   = FASTP.out.reads_fail//
+    ch_trim_reads     = FASTP.out.reads
+        FASTP.out.reads
+            .dump(tag: 'fastp')
+            .map{ meta,reads -> tuple(meta,reads,[]) }
+            .dump(tag: 'ch_unicycler')
+            .set {ch_unicycler}
+
+    //Se ha definido el canal trim_reads para recuperar los archivos de salida de FastP segun su emit, luego se re estructura un nuevo canal
+    //tomando el map inicial de 2 entradas, para hacer una nueva tupla, la cual requiere 3 entradas para unicycler.
+    ch_samplesheet.view()
+    ch_trim_reads.view()
+    ch_unicycler.view()
 
     //
     // MODULE: Run Unicycler
     //
     UNICYCLER (
-        ch_versions_p
+        ch_unicycler
     )
+    ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
+
+    //Se ha definido el canal assembly_read para recuperar el archivo fasta de salida de Unicycler.
+    ch_assembly_read.view()
+
+ /*   
+    //
+    // MODULE: Run Quast
+    //
+    ch_assembly_read
+        .collect{ it[1]}
+        .map {consensus_collect -> tuple([id: "report"], consensus_collect) } //intentar quitar esta linea, para que no se llamen report
+        .set { ch_to_quast }
+
+    QUAST (
+        ch_to_quast,
+        false,
+        false
+    )
+*/
 
     //
     // Collate and save software versions
