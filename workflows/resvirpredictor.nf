@@ -39,6 +39,7 @@ workflow RESVIRPREDICTOR {
     main:
 
     ch_versions = Channel.empty()
+    ch_versions_p = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
     //
@@ -58,6 +59,20 @@ workflow RESVIRPREDICTOR {
         [],
         false,
         false
+    )
+    trim_reads            = FASTP.out.reads
+        trim_json         = FASTP.out.json
+        trim_html         = FASTP.out.html
+        trim_log          = FASTP.out.log
+        trim_reads_fail   = FASTP.out.reads_fail
+        trim_reads_merged = FASTP.out.reads_merged
+        ch_versions_p     = ch_versions_p.mix(FASTP.out.versions.first())
+
+    //
+    // MODULE: Run Unicycler
+    //
+    UNICYCLER (
+        ch_versions_p
     )
 
     //
