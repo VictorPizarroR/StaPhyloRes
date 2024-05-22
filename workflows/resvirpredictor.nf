@@ -10,8 +10,11 @@ include { paramsSummaryMap       } from 'plugin/nf-validation'
 include { FASTP					 } from '../modules/nf-core/fastp/main'
 include { UNICYCLER				 } from '../modules/nf-core/unicycler/main'
 include { QUAST					 } from '../modules/nf-core/quast/main'
+include { ABRICATE_RUN } from '../modules/nf-core/abricate/run/main'
+include { ABRICATE_SUMMARY } from '../modules/nf-core/abricate/summary/main'
 include { ARIBA_GETREF			 } from '../modules/nf-core/ariba/getref/main'
 include { ARIBA_RUN				 } from '../modules/nf-core/ariba/run/main'
+include { PLASMIDFINDER } from '../modules/nf-core/plasmidfinder/main'
 include { PLASMIDID				 } from '../modules/nf-core/plasmidid/main'
 include { SNIPPY_RUN			 } from '../modules/nf-core/snippy/run/main'
 include { SNIPPY_CORE			 } from '../modules/nf-core/snippy/core/main'
@@ -42,7 +45,7 @@ workflow RESVIRPREDICTOR {
     ch_multiqc_files = Channel.empty()
 
 
-    //
+    // ANALISI DE CALIDAD
     // MODULE: Run FastQC
     //
     FASTQC (
@@ -51,7 +54,7 @@ workflow RESVIRPREDICTOR {
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
-    //
+    // TRIMADO
     // MODULE: Run FastP
     //
     FASTP (
@@ -70,11 +73,11 @@ workflow RESVIRPREDICTOR {
 
     //Se ha definido el canal trim_reads para recuperar los archivos de salida de FastP segun su emit, luego se re estructura un nuevo canal
     //tomando el map inicial de 2 entradas, para hacer una nueva tupla, la cual requiere 3 entradas para unicycler.
-    ch_samplesheet.view()
+    /*ch_samplesheet.view()
     ch_trim_reads.view()
     ch_unicycler.view()
-
-    //
+    */
+    // ENSAMBALDO
     // MODULE: Run Unicycler
     //
     UNICYCLER (
@@ -82,24 +85,83 @@ workflow RESVIRPREDICTOR {
     )
     ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
 
-    //Se ha definido el canal assembly_read para recuperar el archivo fasta de salida de Unicycler.
-    ch_assembly_read.view()
-
- /*   
-    //
+    // ANALISIS DE CALIDAD ENSAMBLADO
     // MODULE: Run Quast
     //
-    ch_assembly_read
-        .collect{ it[1]}
-        .map {consensus_collect -> tuple([id: "report"], consensus_collect) } //intentar quitar esta linea, para que no se llamen report
-        .set { ch_to_quast }
-
     QUAST (
-        ch_to_quast,
-        false,
-        false
+        ch_assembly_read,
+        [[:],[]],
+        [[:],[]]
+    )
+
+    // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
+    // MODULE: Run Abricate
+    //
+    ABRICATE_RUN (
+        ch_assembly_read
+    )
+
+    // BUSQUEDA DE PLASMIDOS
+    // MODULE: Run PlasmidFinder
+    //
+    PLASMIDFINDER (
+        ch_trim_reads
+    )
+
+    // IDENTIFICACION DE PLASMIDOS
+    // MODULE: Run PlasmidID
+    //
+    /*PLASMIDID (
+        ch_assembly_scaffolds
+    )
+    
+
+    // ESTUDIO DE FILOGENIA
+    // MODULE: Run Snippy
+    //
+    SNIPPY_RUN (
+        ch_trim_reads,
+        
+    )
+    
+
+    // ESTUDIO DE FILOGENIA
+    // MODULE: Run Snippy
+    //
+    SNIPPY_CORE (
+
     )
 */
+    // TIPADO MOLECULAR
+    // MODULE: Run MLST
+    //
+    MLST (
+        ch_assembly_read
+    )
+
+    // TIPIFICACION DE SECUENCIAS MULTILOCUS PARA STAPHYLOCOCCUS AUREUS
+    // MODULE: Run Spatyper
+    //
+    SPATYPER (
+        ch_assembly_read,
+        [],
+        []
+    )
+
+    // TIPIFICACION SCCmec
+    // MODULE: Run Staphopia SCCmec
+    //
+    STAPHOPIASCCMEC (
+        ch_assembly_read
+    )
+
+    // PREDICCION DE RESISTENCIA
+    // MODULE: Run Mykrobe
+    //
+    MYKROBE_PREDICT (
+        ch_trim_reads,
+        'staph'
+    )
 
     //
     // Collate and save software versions

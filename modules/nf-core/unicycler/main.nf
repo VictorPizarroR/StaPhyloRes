@@ -11,7 +11,7 @@ process UNICYCLER {
     tuple val(meta), path(shortreads), path(longreads)
 
     output:
-    tuple val(meta), path('*.scaffolds.fa.gz'), emit: scaffolds
+    tuple val(meta), path('*.scaffolds.fasta'), emit: scaffolds
     tuple val(meta), path('*.assembly.gfa.gz'), emit: gfa
     tuple val(meta), path('*.log')            , emit: log
     path  "versions.yml"                      , emit: versions
@@ -32,8 +32,7 @@ process UNICYCLER {
         $long_reads \\
         --out ./
 
-    mv assembly.fasta ${prefix}.scaffolds.fa
-    gzip -n ${prefix}.scaffolds.fa
+    mv assembly.fasta ${prefix}.scaffolds.fasta
     mv assembly.gfa ${prefix}.assembly.gfa
     gzip -n ${prefix}.assembly.gfa
     mv unicycler.log ${prefix}.unicycler.log
