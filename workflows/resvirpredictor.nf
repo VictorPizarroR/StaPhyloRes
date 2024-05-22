@@ -22,6 +22,7 @@ include { IQTREE				 } from '../modules/nf-core/iqtree/main'
 include { MLST					 } from '../modules/nf-core/mlst/main'
 include { SPATYPER				 } from '../modules/nf-core/spatyper/main'
 include { STAPHOPIASCCMEC		 } from '../modules/nf-core/staphopiasccmec/main'
+include { AGRVATE } from '../modules/nf-core/agrvate/main'
 include { MYKROBE_PREDICT		 } from '../modules/nf-core/mykrobe/predict/main'
 include { FASTQ_TRIM_FASTP_FASTQC } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -105,7 +106,7 @@ workflow RESVIRPREDICTOR {
     // MODULE: Run PlasmidFinder
     //
     PLASMIDFINDER (
-        ch_trim_reads
+        ch_assembly_read
     )
 
     // IDENTIFICACION DE PLASMIDOS
@@ -152,6 +153,13 @@ workflow RESVIRPREDICTOR {
     // MODULE: Run Staphopia SCCmec
     //
     STAPHOPIASCCMEC (
+        ch_assembly_read
+    )
+
+    // TIPIFICACION agr Locus
+    // MODULE: Run Agrvate
+    //
+    AGRVATE (
         ch_assembly_read
     )
 
