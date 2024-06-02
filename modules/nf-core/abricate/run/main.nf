@@ -9,9 +9,10 @@ process ABRICATE_RUN {
 
     input:
     tuple val(meta), path(assembly)
+    val database
 
     output:
-    tuple val(meta), path("*.txt"), emit: report
+    tuple val(meta), path("${meta.id}.abricate_${database}.txt"), emit: report
     path "versions.yml"           , emit: versions
 
     when:
@@ -22,10 +23,10 @@ process ABRICATE_RUN {
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     abricate \\
+        --db $database \\
         $assembly \\
         $args \\
-        --db resfinder \\
-        --threads $task.cpus > ${prefix}.txt
+        --threads $task.cpus > ${prefix}.abricate_${database}.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

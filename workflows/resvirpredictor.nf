@@ -4,30 +4,37 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-validation'
-include { FASTP					 } from '../modules/nf-core/fastp/main'
-include { UNICYCLER				 } from '../modules/nf-core/unicycler/main'
-include { QUAST					 } from '../modules/nf-core/quast/main'
-include { ABRICATE_RUN } from '../modules/nf-core/abricate/run/main'
-include { ABRICATE_SUMMARY } from '../modules/nf-core/abricate/summary/main'
-include { ARIBA_GETREF			 } from '../modules/nf-core/ariba/getref/main'
-include { ARIBA_RUN				 } from '../modules/nf-core/ariba/run/main'
-include { PLASMIDFINDER } from '../modules/nf-core/plasmidfinder/main'
-include { PLASMIDID				 } from '../modules/nf-core/plasmidid/main'
-include { SNIPPY_RUN			 } from '../modules/nf-core/snippy/run/main'
-include { SNIPPY_CORE			 } from '../modules/nf-core/snippy/core/main'
-include { IQTREE				 } from '../modules/nf-core/iqtree/main'
-include { MLST					 } from '../modules/nf-core/mlst/main'
-include { SPATYPER				 } from '../modules/nf-core/spatyper/main'
-include { STAPHOPIASCCMEC		 } from '../modules/nf-core/staphopiasccmec/main'
-include { AGRVATE } from '../modules/nf-core/agrvate/main'
-include { MYKROBE_PREDICT		 } from '../modules/nf-core/mykrobe/predict/main'
-include { FASTQ_TRIM_FASTP_FASTQC } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { FASTQC                        } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                       } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap              } from 'plugin/nf-validation'
+include { FASTP					        } from '../modules/nf-core/fastp/main'
+include { UNICYCLER				        } from '../modules/nf-core/unicycler/main'
+include { QUAST					        } from '../modules/nf-core/quast/main'
+include { ABRICATE_RUN                  } from '../modules/nf-core/abricate/run/main'
+include { ABRICATE_RUN as ABRICATE_RESFINDER        } from '../modules/nf-core/abricate/run/main'
+include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
+include { ABRICATE_RUN as ABRICATE_PLASMIDFINDER    } from '../modules/nf-core/abricate/run/main'
+include { ABRICATE_SUMMARY              } from '../modules/nf-core/abricate/summary/main'
+include { ARIBA_GETREF as ARIBA_GETREF_RESFINDER		} from '../modules/nf-core/ariba/getref/main'
+include { ARIBA_GETREF as ARIBA_GETREF_VFDB    			} from '../modules/nf-core/ariba/getref/main'
+include { ARIBA_GETREF as ARIBA_GETREF_PLASMIDFINDER	} from '../modules/nf-core/ariba/getref/main'
+include { ARIBA_RUN    as ARIBA_RESFINDER		    } from '../modules/nf-core/ariba/run/main'
+include { ARIBA_RUN    as ARIBA_VFDB    		    } from '../modules/nf-core/ariba/run/main'
+include { ARIBA_RUN    as ARIBA_PLASMIDFINDER		} from '../modules/nf-core/ariba/run/main'
+include { PLASMIDFINDER                 } from '../modules/nf-core/plasmidfinder/main'
+include { PLASMIDID				        } from '../modules/nf-core/plasmidid/main'
+include { SNIPPY_RUN			        } from '../modules/nf-core/snippy/run/main'
+include { SNIPPY_CORE			        } from '../modules/nf-core/snippy/core/main'
+include { IQTREE				        } from '../modules/nf-core/iqtree/main'
+include { MLST					        } from '../modules/nf-core/mlst/main'
+include { SPATYPER				        } from '../modules/nf-core/spatyper/main'
+include { STAPHOPIASCCMEC		        } from '../modules/nf-core/staphopiasccmec/main'
+include { AGRVATE                       } from '../modules/nf-core/agrvate/main'
+include { MYKROBE_PREDICT		        } from '../modules/nf-core/mykrobe/predict/main'
+include { FASTQ_TRIM_FASTP_FASTQC       } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
+include { paramsSummaryMultiqc          } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText        } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,7 +52,27 @@ workflow RESVIRPREDICTOR {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
-
+    //
+    // SUBWORKFLOW: Short reads QC and trim adapters
+    //
+    ch_fastqc_raw_multiqc = Channel.empty()
+    ch_fastqc_trim_multiqc = Channel.empty()
+    ch_trim_json_multiqc = Channel.empty()
+    
+    FASTQ_TRIM_FASTP_FASTQC (
+        ch_samplesheet,
+        [],
+        params.save_trimmed_fail,
+        params.save_merged,
+        params.skip_fastp,
+        params.skip_fastqc
+        )
+        ch_fastqc_raw_multiqc   = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_raw_zip
+        ch_fastqc_trim_multiqc  = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_trim_zip
+        ch_trim_json_multiqc    = FASTQ_TRIM_FASTP_FASTQC.out.trim_json
+        ch_versions = ch_versions.mix(FASTQ_TRIM_FASTP_FASTQC.out.versions)
+    
+    /*
     // ANALISI DE CALIDAD
     // MODULE: Run FastQC
     //
@@ -77,7 +104,7 @@ workflow RESVIRPREDICTOR {
     /*ch_samplesheet.view()
     ch_trim_reads.view()
     ch_unicycler.view()
-    */
+    
     // ENSAMBALDO
     // MODULE: Run Unicycler
     //
@@ -94,21 +121,61 @@ workflow RESVIRPREDICTOR {
         [[:],[]],
         [[:],[]]
     )
+    //ch_quast_multiqc = QUAST.out.tsv
+    //ch_versions      = ch_versions.mix(QUAST.out.versions)
+    
+    // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
+    // MODULE: Ariba Getref and Run
+    //
+    ARIBA_GETREF_RESFINDER (
+        "resfinder"
+    )
+    ch_ariba_db_resfinder           = ARIBA_GETREF_RESFINDER.out.db.dump(tag: 'Ariba_db_resfinder')
 
+    ARIBA_RESFINDER   (
+        FASTP.out.reads,
+        ch_ariba_db_resfinder
+    )
+
+    ARIBA_GETREF_VFDB (
+        "vfdb_core"
+    )
+    ch_ariba_db_vfdb                = ARIBA_GETREF_VFDB.out.db.dump(tag: 'Ariba_db_vfdb')
+
+    ARIBA_VFDB   (
+        FASTP.out.reads,
+        ch_ariba_db_vfdb
+    )
+
+    ARIBA_GETREF_PLASMIDFINDER (
+        "plasmidfinder"
+    )
+    ch_ariba_db_plasmidfinder       = ARIBA_GETREF_PLASMIDFINDER.out.db.dump(tag: 'Ariba_db_plasmidfinder')
+
+    ARIBA_PLASMIDFINDER   (
+        FASTP.out.reads,
+        ch_ariba_db_plasmidfinder
+    )
+    
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
-    // MODULE: Run Abricate
+    // MODULE: Run Multiples databases Abricate
     //
-    ABRICATE_RUN (
-        ch_assembly_read
+    ABRICATE_PLASMIDFINDER (
+        ch_assembly_read,
+        "plasmidfinder"
+    )
+    
+
+    ABRICATE_RESFINDER (
+        ch_assembly_read,
+        "resfinder"
     )
 
-    // BUSQUEDA DE PLASMIDOS
-    // MODULE: Run PlasmidFinder
-    //
-    PLASMIDFINDER (
-        ch_assembly_read
+    ABRICATE_VFDB (
+        ch_assembly_read,
+        "vfdb"
     )
-
+    
     // IDENTIFICACION DE PLASMIDOS
     // MODULE: Run PlasmidID
     //
@@ -132,7 +199,7 @@ workflow RESVIRPREDICTOR {
     SNIPPY_CORE (
 
     )
-*/
+
     // TIPADO MOLECULAR
     // MODULE: Run MLST
     //
@@ -170,7 +237,7 @@ workflow RESVIRPREDICTOR {
         ch_trim_reads,
         'staph'
     )
-
+*/
     //
     // Collate and save software versions
     //
@@ -191,6 +258,10 @@ workflow RESVIRPREDICTOR {
     ch_multiqc_files                      = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files                      = ch_multiqc_files.mix(ch_collated_versions)
     ch_multiqc_files                      = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml', sort: false))
+    ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files                      = ch_multiqc_files.mix(ch_trim_json_multiqc.collect{it[1]}.ifEmpty([]))
+    //ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),

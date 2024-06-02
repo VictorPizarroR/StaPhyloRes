@@ -11,7 +11,7 @@ process ARIBA_GETREF {
     val(db_name)
 
     output:
-    tuple path("${db_name}.tar.gz"), emit: db
+    path("${db_name}.tar.gz"), emit: db
     path "versions.yml"            , emit: versions
 
     when:

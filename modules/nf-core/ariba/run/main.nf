@@ -9,10 +9,10 @@ process ARIBA_RUN {
 
     input:
     tuple val(meta), path(reads)
-    each path(db)
+    each path (db)
 
     output:
-    tuple val(meta), path("${prefix}/*"), emit: results
+    tuple val(meta), path("${meta.id}_${db.getName().replace('.tar.gz', '')}/*"), emit: results
     path "versions.yml"                 , emit: versions
 
     when:
@@ -20,15 +20,16 @@ process ARIBA_RUN {
 
     script:
     def args = task.ext.args ?: ''
-    prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta.id}"
     def db_name = db.getName().replace('.tar.gz', '')
+
     """
     tar -xzvf ${db}
     ariba \\
         run \\
         ${db_name}/ \\
         ${reads} \\
-        ${prefix} \\
+        ${prefix}_${db_name} \\
         $args \\
         --threads $task.cpus
 

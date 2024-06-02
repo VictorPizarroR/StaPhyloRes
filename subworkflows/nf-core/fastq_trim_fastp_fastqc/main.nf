@@ -52,8 +52,8 @@ workflow FASTQ_TRIM_FASTP_FASTQC {
         FASTP (
             ch_reads,
             ch_adapter_fasta,
-            val_save_trimmed_fail,
-            val_save_merged
+            true,
+            false
         )
         ch_trim_reads        = FASTP.out.reads
         ch_trim_json         = FASTP.out.json
