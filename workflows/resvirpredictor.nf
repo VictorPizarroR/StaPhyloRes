@@ -70,40 +70,13 @@ workflow RESVIRPREDICTOR {
         ch_fastqc_raw_multiqc   = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_raw_zip
         ch_fastqc_trim_multiqc  = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_trim_zip
         ch_trim_json_multiqc    = FASTQ_TRIM_FASTP_FASTQC.out.trim_json
-        ch_versions = ch_versions.mix(FASTQ_TRIM_FASTP_FASTQC.out.versions)
-    
-    /*
-    // ANALISI DE CALIDAD
-    // MODULE: Run FastQC
-    //
-    FASTQC (
-        ch_samplesheet
-    )
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
-
-    // TRIMADO
-    // MODULE: Run FastP
-    //
-    FASTP (
-        ch_samplesheet,
-        [],
-        true,
-        false
-    )
-    //trim_reads_fail   = FASTP.out.reads_fail//
-    ch_trim_reads     = FASTP.out.reads
-        FASTP.out.reads
+        ch_trim_fastp           = FASTQ_TRIM_FASTP_FASTQC.out.reads
+            FASTQ_TRIM_FASTP_FASTQC.out.reads
             .dump(tag: 'fastp')
             .map{ meta,reads -> tuple(meta,reads,[]) }
             .dump(tag: 'ch_unicycler')
-            .set {ch_unicycler}
-
-    //Se ha definido el canal trim_reads para recuperar los archivos de salida de FastP segun su emit, luego se re estructura un nuevo canal
-    //tomando el map inicial de 2 entradas, para hacer una nueva tupla, la cual requiere 3 entradas para unicycler.
-    /*ch_samplesheet.view()
-    ch_trim_reads.view()
-    ch_unicycler.view()
+            .set { ch_unicycler }
+        ch_versions             = ch_versions.mix(FASTQ_TRIM_FASTP_FASTQC.out.versions)
     
     // ENSAMBALDO
     // MODULE: Run Unicycler
@@ -116,14 +89,17 @@ workflow RESVIRPREDICTOR {
     // ANALISIS DE CALIDAD ENSAMBLADO
     // MODULE: Run Quast
     //
+    ch_assembly_read
+        .collect{ it[1] }
+        .map { consensus_collect -> tuple([id: "report"], consensus_collect) }
+        .set { ch_to_quast }
     QUAST (
-        ch_assembly_read,
+        ch_to_quast,
         [[:],[]],
         [[:],[]]
     )
-    //ch_quast_multiqc = QUAST.out.tsv
-    //ch_versions      = ch_versions.mix(QUAST.out.versions)
-    
+    ch_quast_multiqc = QUAST.out.tsv
+
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
     // MODULE: Ariba Getref and Run
     //
@@ -133,7 +109,7 @@ workflow RESVIRPREDICTOR {
     ch_ariba_db_resfinder           = ARIBA_GETREF_RESFINDER.out.db.dump(tag: 'Ariba_db_resfinder')
 
     ARIBA_RESFINDER   (
-        FASTP.out.reads,
+        FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_resfinder
     )
 
@@ -143,7 +119,7 @@ workflow RESVIRPREDICTOR {
     ch_ariba_db_vfdb                = ARIBA_GETREF_VFDB.out.db.dump(tag: 'Ariba_db_vfdb')
 
     ARIBA_VFDB   (
-        FASTP.out.reads,
+        FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_vfdb
     )
 
@@ -153,7 +129,7 @@ workflow RESVIRPREDICTOR {
     ch_ariba_db_plasmidfinder       = ARIBA_GETREF_PLASMIDFINDER.out.db.dump(tag: 'Ariba_db_plasmidfinder')
 
     ARIBA_PLASMIDFINDER   (
-        FASTP.out.reads,
+        FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_plasmidfinder
     )
     
@@ -179,27 +155,27 @@ workflow RESVIRPREDICTOR {
     // IDENTIFICACION DE PLASMIDOS
     // MODULE: Run PlasmidID
     //
-    /*PLASMIDID (
+/*  
+    PLASMIDID (
         ch_assembly_scaffolds
     )
-    
-
+*/    
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
     //
     SNIPPY_RUN (
-        ch_trim_reads,
-        
+        ch_trim_fastp,
+        params.snippy_reference
     )
-    
 
+/*    
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
     //
     SNIPPY_CORE (
 
     )
-
+*/
     // TIPADO MOLECULAR
     // MODULE: Run MLST
     //
@@ -234,10 +210,10 @@ workflow RESVIRPREDICTOR {
     // MODULE: Run Mykrobe
     //
     MYKROBE_PREDICT (
-        ch_trim_reads,
+        ch_trim_fastp,
         'staph'
     )
-*/
+    
     //
     // Collate and save software versions
     //
@@ -261,7 +237,7 @@ workflow RESVIRPREDICTOR {
     ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files                      = ch_multiqc_files.mix(ch_trim_json_multiqc.collect{it[1]}.ifEmpty([]))
-    //ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),
