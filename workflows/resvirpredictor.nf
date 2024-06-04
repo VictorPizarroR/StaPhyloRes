@@ -167,15 +167,28 @@ workflow RESVIRPREDICTOR {
         ch_trim_fastp,
         params.snippy_reference
     )
-
-/*    
+    ch_snippy_fa     = SNIPPY_RUN.out.aligned_fa
+    ch_snippy_output = SNIPPY_RUN.out.vcf
+                        .join(ch_snippy_fa)
+                        .set { ch_snippy_core }
+    
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
     //
     SNIPPY_CORE (
-
+        ch_snippy_core,
+        params.snippy_reference
     )
-*/
+    ch_iqtree        = SNIPPY_CORE.out.aln
+
+    // ESTUDIO DE FILOGENIA
+    // MODULE: IQTree
+    //
+    IQTREE (
+        ch_iqtree,
+        []
+    )
+
     // TIPADO MOLECULAR
     // MODULE: Run MLST
     //
