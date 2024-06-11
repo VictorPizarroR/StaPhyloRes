@@ -178,13 +178,13 @@ workflow RESVIRPREDICTOR {
         ch_trim_fastp,
         params.snippy_reference
     )
-    ch_snippy_fa     = SNIPPY_RUN.out.aligned_fa
-    ch_snippy_output = SNIPPY_RUN.out.vcf
-                        .join(ch_snippy_fa)
-                        .set { ch_snippy_core }
-    
-    // ESTUDIO DE FILOGENIA
-    // MODULE: Run Snippy
+    // PREPARACION DE CHANNELS
+    SNIPPY_RUN.out.vcf.collect{meta, vcf -> vcf}.map{ vcf -> [[id:'snippy-core'], vcf]}.set{ ch_merge_vcf }
+    SNIPPY_RUN.out.aligned_fa.collect{meta, aligned_fa -> aligned_fa}.map{ aligned_fa -> [[id:'snippy-core'], aligned_fa]}.set{ ch_merge_aligned_fa }
+    ch_merge_vcf.join( ch_merge_aligned_fa ).set{ ch_snippy_core }
+
+    // ESTUDIO DE FILOGENIA MEDIANTE SNP
+    // MODULE: Run Snippy Core
     //
     SNIPPY_CORE (
         ch_snippy_core,
@@ -192,13 +192,21 @@ workflow RESVIRPREDICTOR {
     )
     ch_iqtree        = SNIPPY_CORE.out.aln
 
-    // ESTUDIO DE FILOGENIA
+    // ESTUDIO DE FILOGENIA MEDIANTE SNP
     // MODULE: IQTree
     //
     IQTREE (
         ch_iqtree,
         []
     )
+    ch_iqtree = 
+    // ESTUDIO DE FILOGENIA MEDIANTE SNP
+    // MODULE: Gubbins
+    //
+    GUBBINS (
+        ch_iqtree
+    )
+
 
     // TIPADO MOLECULAR
     // MODULE: Run MLST

@@ -40,9 +40,34 @@
                         "git_sha": "285a50500f9e02578d90b3ce6382ea3c30216acd",
                         "installed_by": ["fastq_trim_fastp_fastqc", "modules"]
                     },
+                    "gubbins": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
+                    },
                     "iqtree": {
                         "branch": "master",
                         "git_sha": "ba03053ffa300ccdd044545131ba033b73f327fe",
+                        "installed_by": ["modules"]
+                    },
+                    "mash/dist": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
+                    },
+                    "mash/screen": {
+                        "branch": "master",
+                        "git_sha": "10f1f6526942539d5368cedb05afd1aa16eda5be",
+                        "installed_by": ["modules"]
+                    },
+                    "mash/sketch": {
+                        "branch": "master",
+                        "git_sha": "10f1f6526942539d5368cedb05afd1aa16eda5be",
+                        "installed_by": ["modules"]
+                    },
+                    "mashtree": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
                         "installed_by": ["modules"]
                     },
                     "mlst": {
@@ -98,6 +123,11 @@
                     "staphopiasccmec": {
                         "branch": "master",
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
+                    },
+                    "staramr/search": {
+                        "branch": "master",
+                        "git_sha": "41904723fab95a90a9a1b0ccc3daf1d06e542329",
                         "installed_by": ["modules"]
                     },
                     "unicycler": {
