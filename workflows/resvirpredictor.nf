@@ -161,6 +161,12 @@ workflow RESVIRPREDICTOR {
         ch_assembly_read,
         "vfdb"
     )
+
+    // MODULE: Run Multiples databases Staramr Search
+    //
+    STARAMR_SEARCH (
+        ch_assembly_read
+    )
     
     // ANOTACION
     // MODULE: Prokka
@@ -170,6 +176,26 @@ workflow RESVIRPREDICTOR {
         [],
         []
     )
+
+    // BUSQUEDA DE GENOMA DE REFERENCIA
+    // MODULE: Run Mash Dist
+    //
+    MASH_DIST (
+        ch_assembly_read,
+        params.mash_reference
+    )
+
+    
+
+    // BUSQUEDA DE CONTAMINANTES
+    // MODULE: Run Mash Screen
+    //
+    MASH_SCREEN (
+        ch_assembly_read,
+        params.mash_reference
+    )
+
+
 
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
