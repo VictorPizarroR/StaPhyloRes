@@ -162,14 +162,15 @@ workflow RESVIRPREDICTOR {
         "vfdb"
     )
     
-    // IDENTIFICACION DE PLASMIDOS
-    // MODULE: Run PlasmidID
+    // ANOTACION
+    // MODULE: Prokka
     //
-/*  
-    PLASMIDID (
-        ch_assembly_scaffolds
+    PROKKA (
+        ch_assembly_read,
+        [],
+        []
     )
-*/    
+
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
     //
