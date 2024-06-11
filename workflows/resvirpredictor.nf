@@ -226,6 +226,17 @@ workflow RESVIRPREDICTOR {
         []
     )
 
+    // ESTUDIO DE DISTANCIA ENTRE ENSAMBLADOS
+    // MODULE: IQTree
+    //
+     ch_assembly_read
+        .collect{ it[1] }
+        .map { consensus_collect -> tuple([id: "aligments"], consensus_collect) }
+        .set { ch_to_mashtree }
+    MASHTREE (
+        ch_to_mashtree
+    )
+
     // ESTUDIO DE FILOGENIA MEDIANTE SNP
     // MODULE: Gubbins
     //
