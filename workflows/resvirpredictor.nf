@@ -137,19 +137,24 @@ workflow RESVIRPREDICTOR {
         FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_plasmidfinder
     )
+
+    ARIBA_GETREF_CARD (
+        "card"
+    )
+    ch_ariba_db_card              = ARIBA_GETREF_CARD.out.db.dump(tag: 'Ariba_db_card')
+
+    ARIBA_CARD   (
+        FASTQ_TRIM_FASTP_FASTQC.out.reads,
+        ch_ariba_db_card
+    )
+
     
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
     // MODULE: Run Multiples databases Abricate
     //
-    ABRICATE_PLASMIDFINDER (
+    ABRICATE_STAPH (
         ch_assembly_read,
-        "plasmidfinder"
-    )
-    
-
-    ABRICATE_RESFINDER (
-        ch_assembly_read,
-        "resfinder"
+        "staph"
     )
 
     ABRICATE_VFDB (
