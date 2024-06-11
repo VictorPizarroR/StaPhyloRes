@@ -1,6 +1,6 @@
 process MASH_SCREEN {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_low'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -9,7 +9,7 @@ process MASH_SCREEN {
 
     input:
     tuple val(meta) , path(query)
-    tuple val(meta2), path(sequences_sketch)
+    path(sequences_sketch)
 
     output:
     tuple val(meta), path("*.screen"), emit: screen
