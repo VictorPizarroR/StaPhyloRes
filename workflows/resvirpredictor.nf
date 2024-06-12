@@ -244,7 +244,6 @@ workflow RESVIRPREDICTOR {
         ch_to_gubbins
     )
 
-
     // TIPADO MOLECULAR
     // MODULE: Run MLST
     //
