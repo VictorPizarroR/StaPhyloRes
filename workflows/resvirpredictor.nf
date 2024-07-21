@@ -13,6 +13,7 @@ include { QUAST					        } from '../modules/nf-core/quast/main'
 include { CSVTK_CONCAT as CONCAT_RESFINDER                  } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_VFDB                       } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_MLST                       } from '../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCAT_SPATYPER                   } from '../modules/nf-core/csvtk/concat/main'
 include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_SUMMARY as SUMMARY_VFDB                  } from '../modules/nf-core/abricate/summary/main'
@@ -125,7 +126,8 @@ workflow RESVIRPREDICTOR {
     CONCAT_RESFINDER (
         ch_merge_report_resfinder,
         'tsv', 
-        'tsv'
+        'tsv',
+        '-C "$" --lazy-quotes'
     )
 
     ARIBA_GETREF_VFDB (
@@ -143,7 +145,8 @@ workflow RESVIRPREDICTOR {
     CONCAT_VFDB (
         ch_merge_report_vfdb,
         'tsv', 
-        'tsv'
+        'tsv',
+        '-C "$" --lazy-quotes'
     )
 
     ARIBA_GETREF_PLASMIDFINDER (
@@ -285,8 +288,9 @@ workflow RESVIRPREDICTOR {
     CONCAT_MLST (
         ch_merge_mlst,
         'tsv',
-        'tsv'
-        )
+        'tsv',
+        '--no-header-row'
+    )
 
     // TIPIFICACION DE SECUENCIAS MULTILOCUS PARA STAPHYLOCOCCUS AUREUS
     // MODULE: Run Spatyper
@@ -295,6 +299,15 @@ workflow RESVIRPREDICTOR {
         ch_assembly_read,
         [],
         []
+    )
+
+    // Unir Resultados
+    SPATYPER.out.tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'spatyper-report'], tsv]}.set{ ch_merge_spatyper }
+    CONCAT_SPATYPER (
+        ch_merge_spatyper,
+        'tsv',
+        'tsv',
+        ''
     )
 
     // TIPIFICACION SCCmec

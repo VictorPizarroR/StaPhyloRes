@@ -1,3 +1,4 @@
+
 process CSVTK_CONCAT {
     tag "$meta.id"
     label 'process_low'
@@ -11,6 +12,7 @@ process CSVTK_CONCAT {
     tuple val(meta), path(csv)
     val in_format
     val out_format
+    val (args1)
 
     output:
     tuple val(meta), path("${prefix}.${out_extension}"), emit: csv
@@ -28,8 +30,7 @@ process CSVTK_CONCAT {
     """
     csvtk \\
         concat \\
-        -C \$ \\
-        --lazy-quotes \\
+        $args1 \\
         --num-cpus $task.cpus \\
         --delimiter "${delimiter}" \\
         --out-delimiter "${out_delimiter}" \\
