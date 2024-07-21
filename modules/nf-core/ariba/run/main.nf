@@ -42,10 +42,20 @@ process ARIBA_RUN {
         --cluster_cols assembled,match,known_var,pct_id,ctg_cov,novel_var \\
         --col_filter n \\
         --row_filter n
+    
+    echo -e "Sample\\t\$(head -n 1 ${db_name}/report.tsv)" > ${db_name}/${prefix}-report_modified.tsv
+    tail -n +2 ${db_name}/report.tsv | while IFS= read -r line; do
+        echo -e "${meta.id}\\t\$line" >> ${db_name}/${prefix}-report_modified.tsv
+    done
+
+    echo -e "Sample\\t\$(head -n 1 ${db_name}/summary.csv)" > ${db_name}/${prefix}-summary_modified.csv
+    tail -n +2 ${db_name}/summary.csv | while IFS= read -r line; do
+        echo -e "${meta.id}\\t\$line" >> ${db_name}/${prefix}-summary_modified.csv
+    done
 
     # Rename to avoid naming collisions
-    mv ${db_name}/report.tsv ${db_name}/${prefix}-report.tsv
-    mv ${db_name}/summary.csv ${db_name}/${prefix}-summary.csv
+    mv ${db_name}/${prefix}-report_modified.tsv ${db_name}/${prefix}-report.tsv
+    mv ${db_name}/${prefix}-summary_modified.csv ${db_name}/${prefix}-summary.csv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

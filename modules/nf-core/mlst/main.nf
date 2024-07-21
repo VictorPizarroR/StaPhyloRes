@@ -27,6 +27,12 @@ process MLST {
         $fasta \\
         > ${prefix}.tsv
 
+    while IFS= read -r line; do
+        echo -e "${meta.id}\\t\$line" >> ${prefix}_modified.tsv
+    done < ${prefix}.tsv
+
+    mv ${prefix}_modified.tsv ${prefix}.tsv
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         mlst: \$( echo \$(mlst --version 2>&1) | sed 's/mlst //' )

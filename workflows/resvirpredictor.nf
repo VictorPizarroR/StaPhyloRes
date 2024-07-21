@@ -14,6 +14,9 @@ include { CSVTK_CONCAT as CONCAT_RESFINDER                  } from '../modules/n
 include { CSVTK_CONCAT as CONCAT_VFDB                       } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_MLST                       } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_SPATYPER                   } from '../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCAT_SCCMEC                     } from '../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCAT_AGRVATE                    } from '../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCAT_MYKROBE                    } from '../modules/nf-core/csvtk/concat/main'
 include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_SUMMARY as SUMMARY_VFDB                  } from '../modules/nf-core/abricate/summary/main'
@@ -121,7 +124,7 @@ workflow RESVIRPREDICTOR {
         FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_resfinder
     )
-    ARIBA_RESFINDER.out.report.collect{meta, report -> report}.map{ report -> [[id:"resfinder-report"], report]}.set{ ch_merge_report_resfinder }
+    ARIBA_RESFINDER.out.report.collect{meta, report -> report}.map{ report -> [[id:"ariba-resfinder-report"], report]}.set{ ch_merge_report_resfinder }
 
     CONCAT_RESFINDER (
         ch_merge_report_resfinder,
@@ -140,7 +143,7 @@ workflow RESVIRPREDICTOR {
         ch_ariba_db_vfdb
     )
 
-    ARIBA_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:"vfdb-report"], report]}.set{ ch_merge_report_vfdb }
+    ARIBA_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:"ariba-vfdb-report"], report]}.set{ ch_merge_report_vfdb }
 
     CONCAT_VFDB (
         ch_merge_report_vfdb,
@@ -317,11 +320,29 @@ workflow RESVIRPREDICTOR {
         ch_assembly_read
     )
 
+    // Unir Resultados
+    STAPHOPIASCCMEC.out.tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staphopiasccmec-report'], tsv]}.set{ ch_merge_sccmec }
+    CONCAT_SCCMEC (
+        ch_merge_sccmec,
+        'tsv',
+        'tsv',
+        ''
+    )
+
     // TIPIFICACION agr Locus
     // MODULE: Run Agrvate
     //
     AGRVATE (
         ch_assembly_read
+    )
+
+    // Unir Resultados
+    AGRVATE.out.summary.collect{meta, summary -> summary}.map{ summary -> [[id:'agrvate-report'], summary]}.set{ ch_merge_agrvate }
+    CONCAT_AGRVATE (
+        ch_merge_agrvate,
+        'tsv',
+        'tsv',
+        '-C "$"'
     )
 
     // PREDICCION DE RESISTENCIA
@@ -330,6 +351,16 @@ workflow RESVIRPREDICTOR {
     MYKROBE_PREDICT (
         ch_trim_fastp,
         'staph'
+    )
+
+    // Unir Resultados
+    MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
+    
+    CONCAT_MYKROBE (
+        ch_merge_mykrobe,
+        'csv',
+        'csv',
+        ''
     )
 
     //

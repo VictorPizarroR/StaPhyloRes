@@ -23,6 +23,13 @@ process STAPHOPIASCCMEC {
     """
     staphopia-sccmec --assembly $fasta $args > ${prefix}.tsv
 
+    echo -e "Sample\\t\$(head -n 1 ${prefix}.tsv)" > ${prefix}_modified.tsv
+    tail -n +2 ${prefix}.tsv | while IFS= read -r line; do
+        echo -e "${meta.id}\\t\$line" >> ${prefix}_modified.tsv
+    done
+
+    mv ${prefix}_modified.tsv ${prefix}.tsv
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         staphopiasccmec: \$(staphopia-sccmec --version 2>&1 | sed 's/^.*staphopia-sccmec //')
