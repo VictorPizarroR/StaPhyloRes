@@ -12,8 +12,9 @@ process ARIBA_RUN {
     each path (db)
 
     output:
-    tuple val(meta), path("${meta.id}_${db.getName().replace('.tar.gz', '')}/*"), emit: results
-    path "versions.yml"                 , emit: versions
+    tuple val(meta), path("${db.getName().replace('.tar.gz', '')}/${meta.id}-report.tsv")      , emit: report
+    tuple val(meta), path("${db.getName().replace('.tar.gz', '')}/${meta.id}-summary.csv")     , emit: summary
+    path "versions.yml"                                                                        , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -25,13 +26,26 @@ process ARIBA_RUN {
 
     """
     tar -xzvf ${db}
+    mv ${db_name} ${db_name}_db
     ariba \\
         run \\
-        ${db_name}/ \\
+        ${db_name}_db/ \\
         ${reads} \\
-        ${prefix}_${db_name} \\
+        ${db_name} \\
         $args \\
         --threads $task.cpus
+
+    ariba \\
+        summary \\
+        ${db_name}/summary \\
+        ${db_name}/report.tsv \\
+        --cluster_cols assembled,match,known_var,pct_id,ctg_cov,novel_var \\
+        --col_filter n \\
+        --row_filter n
+
+    # Rename to avoid naming collisions
+    mv ${db_name}/report.tsv ${db_name}/${prefix}-report.tsv
+    mv ${db_name}/summary.csv ${db_name}/${prefix}-summary.csv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -30,6 +30,11 @@
                         "git_sha": "3e41ebffce3bad51294414513fa99f0f0fdda75a",
                         "installed_by": ["modules"]
                     },
+                    "csvtk/concat": {
+                        "branch": "master",
+                        "git_sha": "cfe2a24902bfdfe8132f11461ffda92d257f9f09",
+                        "installed_by": ["modules"]
+                    },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "95cf5fe0194c7bf5cb0e3027a2eb7e7c89385080",

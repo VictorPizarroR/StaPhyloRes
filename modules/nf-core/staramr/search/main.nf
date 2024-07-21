@@ -11,14 +11,14 @@ process STARAMR_SEARCH {
     tuple val(meta), path(genome_fasta) // genome as a fasta file
 
     output:
-    tuple val(meta), path("*_results/results.xlsx")        , emit: results_xlsx
-    tuple val(meta), path("*_results/summary.tsv")         , emit: summary_tsv
-    tuple val(meta), path("*_results/detailed_summary.tsv"), emit: detailed_summary_tsv
-    tuple val(meta), path("*_results/resfinder.tsv")       , emit: resfinder_tsv
-    tuple val(meta), path("*_results/plasmidfinder.tsv")   , emit: plasmidfinder_tsv
-    tuple val(meta), path("*_results/mlst.tsv")            , emit: mlst_tsv
-    tuple val(meta), path("*_results/settings.txt")        , emit: settings_txt
-    tuple val(meta), path("*_results/pointfinder.tsv")     , emit: pointfinder_tsv, optional: true
+    tuple val(meta), path("results/${meta.id}_results.xlsx")        , emit: results_xlsx
+    tuple val(meta), path("results/${meta.id}_summary.tsv")         , emit: summary_tsv
+    tuple val(meta), path("results/${meta.id}_detailed_summary.tsv"), emit: detailed_summary_tsv
+    tuple val(meta), path("results/${meta.id}_resfinder.tsv")       , emit: resfinder_tsv
+    tuple val(meta), path("results/${meta.id}_plasmidfinder.tsv")   , emit: plasmidfinder_tsv
+    tuple val(meta), path("results/${meta.id}_mlst.tsv")            , emit: mlst_tsv
+    tuple val(meta), path("results/${meta.id}_settings.txt")        , emit: settings_txt
+    tuple val(meta), path("results/${meta.id}_pointfinder.tsv")     , emit: pointfinder_tsv, optional: true
     path "versions.yml"                                    , emit: versions
 
     when:
@@ -38,7 +38,7 @@ process STARAMR_SEARCH {
         search \\
         $args \\
         --nprocs $task.cpus \\
-        -o ${prefix}_results \\
+        -o results/${meta.id}_* \\
         $genome_uncompressed_name
 
     cat <<-END_VERSIONS > versions.yml

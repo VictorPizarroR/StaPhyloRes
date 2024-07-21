@@ -12,7 +12,7 @@ process ABRICATE_RUN {
     val database
 
     output:
-    tuple val(meta), path("${meta.id}.abricate_${database}.txt"), emit: report
+    tuple val(meta), path("${meta.id}_${database}.txt"), emit: report
     path "versions.yml"           , emit: versions
 
     when:
@@ -26,7 +26,7 @@ process ABRICATE_RUN {
         --db $database \\
         $assembly \\
         $args \\
-        --threads $task.cpus > ${prefix}.abricate_${database}.txt
+        --threads $task.cpus > ${prefix}_${database}.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

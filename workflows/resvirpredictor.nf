@@ -10,10 +10,13 @@ include { paramsSummaryMap              } from 'plugin/nf-validation'
 include { FASTP					        } from '../modules/nf-core/fastp/main'
 include { UNICYCLER				        } from '../modules/nf-core/unicycler/main'
 include { QUAST					        } from '../modules/nf-core/quast/main'
-include { ABRICATE_RUN                  } from '../modules/nf-core/abricate/run/main'
+include { CSVTK_CONCAT as CONCAT_RESFINDER                  } from '../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCAT_VFDB                       } from '../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCAT_MLST                       } from '../modules/nf-core/csvtk/concat/main'
 include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
-include { ABRICATE_SUMMARY              } from '../modules/nf-core/abricate/summary/main'
+include { ABRICATE_SUMMARY as SUMMARY_VFDB                  } from '../modules/nf-core/abricate/summary/main'
+include { ABRICATE_SUMMARY as SUMMARY_STAPH                 } from '../modules/nf-core/abricate/summary/main'
 include { ARIBA_GETREF as ARIBA_GETREF_RESFINDER		} from '../modules/nf-core/ariba/getref/main'
 include { ARIBA_GETREF as ARIBA_GETREF_VFDB    			} from '../modules/nf-core/ariba/getref/main'
 include { ARIBA_GETREF as ARIBA_GETREF_PLASMIDFINDER	} from '../modules/nf-core/ariba/getref/main'
@@ -117,6 +120,13 @@ workflow RESVIRPREDICTOR {
         FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_resfinder
     )
+    ARIBA_RESFINDER.out.report.collect{meta, report -> report}.map{ report -> [[id:"resfinder-report"], report]}.set{ ch_merge_report_resfinder }
+
+    CONCAT_RESFINDER (
+        ch_merge_report_resfinder,
+        'tsv', 
+        'tsv'
+    )
 
     ARIBA_GETREF_VFDB (
         "vfdb_core"
@@ -126,6 +136,14 @@ workflow RESVIRPREDICTOR {
     ARIBA_VFDB   (
         FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_vfdb
+    )
+
+    ARIBA_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:"vfdb-report"], report]}.set{ ch_merge_report_vfdb }
+
+    CONCAT_VFDB (
+        ch_merge_report_vfdb,
+        'tsv', 
+        'tsv'
     )
 
     ARIBA_GETREF_PLASMIDFINDER (
@@ -147,7 +165,6 @@ workflow RESVIRPREDICTOR {
         FASTQ_TRIM_FASTP_FASTQC.out.reads,
         ch_ariba_db_card
     )
-
     
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
     // MODULE: Run Multiples databases Abricate
@@ -157,17 +174,29 @@ workflow RESVIRPREDICTOR {
         "staph"
     )
 
+    ABRICATE_STAPH.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate_summary_staph'], report]}.set{ ch_merge_abricate_staph }
+
+    SUMMARY_STAPH (
+        ch_merge_abricate_staph
+        )
+
     ABRICATE_VFDB (
         ch_assembly_read,
         "vfdb"
     )
 
+    ABRICATE_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate_summary_vfdb'], report]}.set{ ch_merge_abricate_vfdb }
+    
+    SUMMARY_VFDB (
+        ch_merge_abricate_vfdb
+        )
+/*
     // MODULE: Run Multiples databases Staramr Search
     //
     STARAMR_SEARCH (
         ch_assembly_read
     )
-    
+*/    
     // ANOTACION
     // MODULE: Prokka
     //
@@ -236,20 +265,28 @@ workflow RESVIRPREDICTOR {
     MASHTREE (
         ch_to_mashtree
     )
-
+/*
     // ESTUDIO DE FILOGENIA MEDIANTE SNP
     // MODULE: Gubbins
     //
     GUBBINS (
         ch_to_gubbins
     )
-
+*/
     // TIPADO MOLECULAR
     // MODULE: Run MLST
     //
     MLST (
         ch_assembly_read
     )
+
+    // Unir Resultados
+    MLST.out.tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'mlst-report'], tsv]}.set{ ch_merge_mlst }
+    CONCAT_MLST (
+        ch_merge_mlst,
+        'tsv',
+        'tsv'
+        )
 
     // TIPIFICACION DE SECUENCIAS MULTILOCUS PARA STAPHYLOCOCCUS AUREUS
     // MODULE: Run Spatyper
@@ -281,7 +318,7 @@ workflow RESVIRPREDICTOR {
         ch_trim_fastp,
         'staph'
     )
-    
+
     //
     // Collate and save software versions
     //
