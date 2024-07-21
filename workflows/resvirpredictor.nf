@@ -4,14 +4,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FASTQC                        } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                       } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap              } from 'plugin/nf-validation'
-include { FASTP					        } from '../modules/nf-core/fastp/main'
 include { UNICYCLER				        } from '../modules/nf-core/unicycler/main'
 include { QUAST					        } from '../modules/nf-core/quast/main'
-include { CSVTK_CONCAT as CONCAT_RESFINDER                  } from '../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCAT_VFDB                       } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_MLST                       } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_SPATYPER                   } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_SCCMEC                     } from '../modules/nf-core/csvtk/concat/main'
@@ -21,14 +17,6 @@ include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/a
 include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_SUMMARY as SUMMARY_VFDB                  } from '../modules/nf-core/abricate/summary/main'
 include { ABRICATE_SUMMARY as SUMMARY_STAPH                 } from '../modules/nf-core/abricate/summary/main'
-include { ARIBA_GETREF as ARIBA_GETREF_RESFINDER		} from '../modules/nf-core/ariba/getref/main'
-include { ARIBA_GETREF as ARIBA_GETREF_VFDB    			} from '../modules/nf-core/ariba/getref/main'
-include { ARIBA_GETREF as ARIBA_GETREF_PLASMIDFINDER	} from '../modules/nf-core/ariba/getref/main'
-include { ARIBA_GETREF as ARIBA_GETREF_CARD         	} from '../modules/nf-core/ariba/getref/main'
-include { ARIBA_RUN    as ARIBA_RESFINDER		        } from '../modules/nf-core/ariba/run/main'
-include { ARIBA_RUN    as ARIBA_VFDB    		        } from '../modules/nf-core/ariba/run/main'
-include { ARIBA_RUN    as ARIBA_PLASMIDFINDER		    } from '../modules/nf-core/ariba/run/main'
-include { ARIBA_RUN    as ARIBA_CARD        		    } from '../modules/nf-core/ariba/run/main'
 include { STARAMR_SEARCH                                } from '../modules/nf-core/staramr/search/main'
 include { PROKKA                        } from '../modules/nf-core/prokka/main'
 include { MASH_DIST                     } from '../modules/nf-core/mash/dist/main'
@@ -45,9 +33,13 @@ include { MASH_SKETCH as SKETCH_REFERENCE               } from '../modules/nf-co
 include { MASH_SCREEN                   } from '../modules/nf-core/mash/screen/main'
 include { GUBBINS                       } from '../modules/nf-core/gubbins/main'
 include { FASTQ_TRIM_FASTP_FASTQC       } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
-include { paramsSummaryMultiqc          } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText        } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { ARIBA as ARIBA_RESFINDER                          } from '../subworkflows/local/ariba'
+include { ARIBA as ARIBA_VFDB                               } from '../subworkflows/local/ariba'
+include { ARIBA as ARIBA_PLASMIDFINDER                      } from '../subworkflows/local/ariba'
+include { ARIBA as ARIBA_CARD                               } from '../subworkflows/local/ariba'
+include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -113,63 +105,26 @@ workflow RESVIRPREDICTOR {
     ch_quast_multiqc = QUAST.out.tsv
 
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
-    // MODULE: Ariba Getref and Run
+    // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
     //
-    ARIBA_GETREF_RESFINDER (
-        "resfinder"
-    )
-    ch_ariba_db_resfinder           = ARIBA_GETREF_RESFINDER.out.db.dump(tag: 'Ariba_db_resfinder')
-
-    ARIBA_RESFINDER   (
-        FASTQ_TRIM_FASTP_FASTQC.out.reads,
-        ch_ariba_db_resfinder
-    )
-    ARIBA_RESFINDER.out.report.collect{meta, report -> report}.map{ report -> [[id:"ariba-resfinder-report"], report]}.set{ ch_merge_report_resfinder }
-
-    CONCAT_RESFINDER (
-        ch_merge_report_resfinder,
-        'tsv', 
-        'tsv',
-        '-C "$" --lazy-quotes'
+    ARIBA_RESFINDER (
+    ch_trim_fastp,
+    'resfinder'
     )
 
-    ARIBA_GETREF_VFDB (
-        "vfdb_core"
-    )
-    ch_ariba_db_vfdb                = ARIBA_GETREF_VFDB.out.db.dump(tag: 'Ariba_db_vfdb')
-
-    ARIBA_VFDB   (
-        FASTQ_TRIM_FASTP_FASTQC.out.reads,
-        ch_ariba_db_vfdb
+    ARIBA_PLASMIDFINDER (
+    ch_trim_fastp,
+    'plasmidfinder'
     )
 
-    ARIBA_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:"ariba-vfdb-report"], report]}.set{ ch_merge_report_vfdb }
-
-    CONCAT_VFDB (
-        ch_merge_report_vfdb,
-        'tsv', 
-        'tsv',
-        '-C "$" --lazy-quotes'
+    ARIBA_CARD (
+    ch_trim_fastp,
+    'card'
     )
 
-    ARIBA_GETREF_PLASMIDFINDER (
-        "plasmidfinder"
-    )
-    ch_ariba_db_plasmidfinder       = ARIBA_GETREF_PLASMIDFINDER.out.db.dump(tag: 'Ariba_db_plasmidfinder')
-
-    ARIBA_PLASMIDFINDER   (
-        FASTQ_TRIM_FASTP_FASTQC.out.reads,
-        ch_ariba_db_plasmidfinder
-    )
-
-    ARIBA_GETREF_CARD (
-        "card"
-    )
-    ch_ariba_db_card              = ARIBA_GETREF_CARD.out.db.dump(tag: 'Ariba_db_card')
-
-    ARIBA_CARD   (
-        FASTQ_TRIM_FASTP_FASTQC.out.reads,
-        ch_ariba_db_card
+    ARIBA_VFDB (
+    ch_trim_fastp,
+    'vfdb_core'
     )
     
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
