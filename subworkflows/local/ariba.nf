@@ -10,8 +10,8 @@
 
 include { ARIBA_GETREF              } from '../../modules/nf-core/ariba/getref/main'
 include { ARIBA_RUN                 } from '../../modules/nf-core/ariba/run/main'
-include { CSVTK_CONCAT as CSVTK_CONCAT_REPORT                 } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CSVTK_CONCAT_SUMMARY                } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as SUMMARY_CSVTK_CONCAT_REPORT                 } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as SUMMARY_CSVTK_CONCAT_SUMMARY                } from '../../modules/nf-core/csvtk/concat/main'
 
 /*
 ========================================================================================
@@ -43,8 +43,8 @@ workflow ARIBA {
         .map{ summary -> [[id:"ariba-${db_name}-summary"], summary]}
         .set{ ch_merge_summary }
 
-    CSVTK_CONCAT_REPORT(ch_merge_report, 'tsv', 'tsv', '-C "$" --lazy-quotes')
+    SUMMARY_CSVTK_CONCAT_REPORT(ch_merge_report, 'tsv', 'tsv', '-C "$" --lazy-quotes')
 
-    CSVTK_CONCAT_SUMMARY(ch_merge_summary, 'csv', 'csv', '--lazy-quotes')
+    SUMMARY_CSVTK_CONCAT_SUMMARY(ch_merge_summary, 'csv', 'csv', '--lazy-quotes')
 
 }

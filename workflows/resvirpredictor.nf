@@ -8,10 +8,6 @@ include { MULTIQC                       } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap              } from 'plugin/nf-validation'
 include { UNICYCLER				        } from '../modules/nf-core/unicycler/main'
 include { QUAST					        } from '../modules/nf-core/quast/main'
-include { CSVTK_CONCAT as CONCAT_MLST                       } from '../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCAT_SPATYPER                   } from '../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCAT_SCCMEC                     } from '../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCAT_AGRVATE                    } from '../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCAT_MYKROBE                    } from '../modules/nf-core/csvtk/concat/main'
 include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
@@ -25,14 +21,12 @@ include { SNIPPY_CORE			        } from '../modules/nf-core/snippy/core/main'
 include { MASHTREE                      } from '../modules/nf-core/mashtree/main'
 include { IQTREE				        } from '../modules/nf-core/iqtree/main'
 include { MLST					        } from '../modules/nf-core/mlst/main'
-include { SPATYPER				        } from '../modules/nf-core/spatyper/main'
-include { STAPHOPIASCCMEC		        } from '../modules/nf-core/staphopiasccmec/main'
-include { AGRVATE                       } from '../modules/nf-core/agrvate/main'
 include { MYKROBE_PREDICT		        } from '../modules/nf-core/mykrobe/predict/main'
 include { MASH_SKETCH as SKETCH_REFERENCE               } from '../modules/nf-core/mash/sketch/main'
 include { MASH_SCREEN                   } from '../modules/nf-core/mash/screen/main'
 include { GUBBINS                       } from '../modules/nf-core/gubbins/main'
 include { FASTQ_TRIM_FASTP_FASTQC       } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
+include { STAPTYPES                     } from '../subworkflows/local/staptypes'
 include { ARIBA as ARIBA_RESFINDER                          } from '../subworkflows/local/ariba'
 include { ARIBA as ARIBA_VFDB                               } from '../subworkflows/local/ariba'
 include { ARIBA as ARIBA_PLASMIDFINDER                      } from '../subworkflows/local/ariba'
@@ -134,8 +128,7 @@ workflow RESVIRPREDICTOR {
         ch_assembly_read,
         "staph"
     )
-
-    ABRICATE_STAPH.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate_summary_staph'], report]}.set{ ch_merge_abricate_staph }
+    ABRICATE_STAPH.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate-staph'], report]}.set{ ch_merge_abricate_staph }
 
     SUMMARY_STAPH (
         ch_merge_abricate_staph
@@ -146,7 +139,7 @@ workflow RESVIRPREDICTOR {
         "vfdb"
     )
 
-    ABRICATE_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate_summary_vfdb'], report]}.set{ ch_merge_abricate_vfdb }
+    ABRICATE_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate-vfdb'], report]}.set{ ch_merge_abricate_vfdb }
     
     SUMMARY_VFDB (
         ch_merge_abricate_vfdb
@@ -234,70 +227,8 @@ workflow RESVIRPREDICTOR {
         ch_to_gubbins
     )
 */
-    // TIPADO MOLECULAR
-    // MODULE: Run MLST
-    //
-    MLST (
+    STAPTYPES (
         ch_assembly_read
-    )
-
-    // Unir Resultados
-    MLST.out.tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'mlst-report'], tsv]}.set{ ch_merge_mlst }
-    CONCAT_MLST (
-        ch_merge_mlst,
-        'tsv',
-        'tsv',
-        '--no-header-row'
-    )
-
-    // TIPIFICACION DE SECUENCIAS MULTILOCUS PARA STAPHYLOCOCCUS AUREUS
-    // MODULE: Run Spatyper
-    //
-    SPATYPER (
-        ch_assembly_read,
-        [],
-        []
-    )
-
-    // Unir Resultados
-    SPATYPER.out.tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'spatyper-report'], tsv]}.set{ ch_merge_spatyper }
-    CONCAT_SPATYPER (
-        ch_merge_spatyper,
-        'tsv',
-        'tsv',
-        ''
-    )
-
-    // TIPIFICACION SCCmec
-    // MODULE: Run Staphopia SCCmec
-    //
-    STAPHOPIASCCMEC (
-        ch_assembly_read
-    )
-
-    // Unir Resultados
-    STAPHOPIASCCMEC.out.tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staphopiasccmec-report'], tsv]}.set{ ch_merge_sccmec }
-    CONCAT_SCCMEC (
-        ch_merge_sccmec,
-        'tsv',
-        'tsv',
-        ''
-    )
-
-    // TIPIFICACION agr Locus
-    // MODULE: Run Agrvate
-    //
-    AGRVATE (
-        ch_assembly_read
-    )
-
-    // Unir Resultados
-    AGRVATE.out.summary.collect{meta, summary -> summary}.map{ summary -> [[id:'agrvate-report'], summary]}.set{ ch_merge_agrvate }
-    CONCAT_AGRVATE (
-        ch_merge_agrvate,
-        'tsv',
-        'tsv',
-        '-C "$"'
     )
 
     // PREDICCION DE RESISTENCIA
