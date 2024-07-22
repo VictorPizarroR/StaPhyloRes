@@ -90,6 +90,11 @@
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
                         "installed_by": ["modules"]
                     },
+                    "ncbigenomedownload": {
+                        "branch": "master",
+                        "git_sha": "4be1afba55bca38b29b44767b699ca7996f26d4d",
+                        "installed_by": ["modules"]
+                    },
                     "phispy": {
                         "branch": "master",
                         "git_sha": "89f5a0aba403cc3c2ae6342d13ac067d883f94b1",

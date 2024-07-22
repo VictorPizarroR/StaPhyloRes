@@ -14,10 +14,10 @@ include { MLST					        } from '../../modules/nf-core/mlst/main'
 include { SPATYPER				        } from '../../modules/nf-core/spatyper/main'
 include { STAPHOPIASCCMEC		        } from '../../modules/nf-core/staphopiasccmec/main'
 include { AGRVATE                       } from '../../modules/nf-core/agrvate/main'
-include { CSVTK_CONCAT as SUMMARY_CONCAT_MLST                       } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as SUMMARY_CONCAT_SPATYPER                   } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as SUMMARY_CONCAT_SCCMEC                     } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as SUMMARY_CONCAT_AGRVATE                    } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as SUMMARY_MLST                       } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as SUMMARY_SPATYPER                   } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as SUMMARY_SCCMEC                     } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as SUMMARY_AGRVATE                    } from '../../modules/nf-core/csvtk/concat/main'
 
 /*
 ========================================================================================
@@ -61,28 +61,28 @@ workflow STAPTYPES {
         .set{ ch_merge_agrvate }
 
     //Merge Results
-    SUMMARY_CONCAT_MLST (
+    SUMMARY_MLST (
         ch_merge_mlst,
         'tsv',
         'tsv',
         '--no-header-row'
         )
     
-    SUMMARY_CONCAT_SPATYPER (
+    SUMMARY_SPATYPER (
         ch_merge_spatyper,
         'tsv',
         'tsv',
         ''
     )
 
-    SUMMARY_CONCAT_SCCMEC (
+    SUMMARY_SCCMEC (
         ch_merge_sccmec,
         'tsv',
         'tsv',
         ''
     )
 
-    SUMMARY_CONCAT_AGRVATE (
+    SUMMARY_AGRVATE (
         ch_merge_agrvate,
         'tsv',
         'tsv',

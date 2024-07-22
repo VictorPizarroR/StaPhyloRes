@@ -12,7 +12,7 @@ process MASH_SCREEN {
     path(sequences_sketch)
 
     output:
-    tuple val(meta), path("*.screen"), emit: screen
+    tuple val(meta), path("*.screen.tab"), emit: screen
     path "versions.yml"              , emit: versions
 
     when:
@@ -28,7 +28,7 @@ process MASH_SCREEN {
         -p $task.cpus \\
         $sequences_sketch \\
         $query \\
-        > ${prefix}.screen
+        > ${prefix}.screen.tab
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -40,7 +40,7 @@ process MASH_SCREEN {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}.screen
+    touch ${prefix}.screen.tab
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

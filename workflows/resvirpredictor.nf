@@ -8,7 +8,6 @@ include { MULTIQC                       } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap              } from 'plugin/nf-validation'
 include { UNICYCLER				        } from '../modules/nf-core/unicycler/main'
 include { QUAST					        } from '../modules/nf-core/quast/main'
-include { CSVTK_CONCAT as CONCAT_MYKROBE                    } from '../modules/nf-core/csvtk/concat/main'
 include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
 include { ABRICATE_SUMMARY as SUMMARY_VFDB                  } from '../modules/nf-core/abricate/summary/main'
@@ -20,11 +19,12 @@ include { SNIPPY_RUN			        } from '../modules/nf-core/snippy/run/main'
 include { SNIPPY_CORE			        } from '../modules/nf-core/snippy/core/main'
 include { MASHTREE                      } from '../modules/nf-core/mashtree/main'
 include { IQTREE				        } from '../modules/nf-core/iqtree/main'
-include { MLST					        } from '../modules/nf-core/mlst/main'
 include { MYKROBE_PREDICT		        } from '../modules/nf-core/mykrobe/predict/main'
+include { CSVTK_CONCAT as SUMMARY_MYKROBE                    } from '../modules/nf-core/csvtk/concat/main'
 include { MASH_SKETCH as SKETCH_REFERENCE               } from '../modules/nf-core/mash/sketch/main'
 include { MASH_SCREEN                   } from '../modules/nf-core/mash/screen/main'
 include { GUBBINS                       } from '../modules/nf-core/gubbins/main'
+include { NCBIGENOMEDOWNLOAD } from '../modules/nf-core/ncbigenomedownload/main'
 include { FASTQ_TRIM_FASTP_FASTQC       } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
 include { STAPTYPES                     } from '../subworkflows/local/staptypes'
 include { ARIBA as ARIBA_RESFINDER                          } from '../subworkflows/local/ariba'
@@ -102,23 +102,23 @@ workflow RESVIRPREDICTOR {
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
     //
     ARIBA_RESFINDER (
-    ch_trim_fastp,
-    'resfinder'
+        ch_trim_fastp,
+        'resfinder'
     )
 
     ARIBA_PLASMIDFINDER (
-    ch_trim_fastp,
-    'plasmidfinder'
+        ch_trim_fastp,
+        'plasmidfinder'
     )
 
     ARIBA_CARD (
-    ch_trim_fastp,
-    'card'
+        ch_trim_fastp,
+        'card'
     )
 
     ARIBA_VFDB (
-    ch_trim_fastp,
-    'vfdb_core'
+        ch_trim_fastp,
+        'vfdb_core'
     )
     
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
@@ -176,12 +176,26 @@ workflow RESVIRPREDICTOR {
         params.mash_reference
     )
 
+    // DESCARGA DE BASE DE DATOS DE REFERENCIA
+    // MODULE: Run ncbi-genome-download
+    //
+    NCBIGENOMEDOWNLOAD (
+        [ id:"refseq" ],
+        'GCF_000253135.1',
+        [],
+        'bacteria'
+    )
+    ch_refseq           = NCBIGENOMEDOWNLOAD.out.gbk
+        ch_refseq
+            .collect{ it[1] }
+            .set { ch_to_snippy }
+
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
     //
     SNIPPY_RUN (
         ch_trim_fastp,
-        params.snippy_reference
+        ch_to_snippy
     )
 
     // PREPARACION DE CHANNELS
@@ -194,7 +208,7 @@ workflow RESVIRPREDICTOR {
     //
     SNIPPY_CORE (
         ch_snippy_core,
-        params.snippy_reference
+        ch_to_snippy
     )
     ch_iqtree        = SNIPPY_CORE.out.aln
         ch_iqtree
@@ -216,6 +230,7 @@ workflow RESVIRPREDICTOR {
         .collect{ it[1] }
         .map { consensus_collect -> tuple([id: "aligments"], consensus_collect) }
         .set { ch_to_mashtree }
+    
     MASHTREE (
         ch_to_mashtree
     )
@@ -239,10 +254,9 @@ workflow RESVIRPREDICTOR {
         'staph'
     )
 
-    // Unir Resultados
     MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
     
-    CONCAT_MYKROBE (
+    SUMMARY_MYKROBE (
         ch_merge_mykrobe,
         'csv',
         'csv',
