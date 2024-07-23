@@ -12,7 +12,7 @@ process MASH_DIST {
     path reference
 
     output:
-    tuple val(meta), path("*.txt"), emit: dist
+    tuple val(meta), path("*.tab"), emit: dist
     path "versions.yml"           , emit: versions
 
     when:
@@ -27,7 +27,7 @@ process MASH_DIST {
         -p $task.cpus \\
         $args \\
         $reference \\
-        $query > ${prefix}.txt
+        $query > ${prefix}.tab
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
