@@ -1,13 +1,14 @@
 process MASH_SKETCH {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_low'
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mash:2.3--he348c14_1' :
         'biocontainers/mash:2.3--he348c14_1' }"
 
     input:
-    tuple val(meta), path(reads)
+    val(meta)
+    path(reads)
 
     output:
     tuple val(meta), path("*.msh")        , emit: mash

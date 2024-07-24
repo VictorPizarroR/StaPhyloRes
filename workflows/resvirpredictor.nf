@@ -161,15 +161,7 @@ workflow RESVIRPREDICTOR {
         [],
         []
     )
-/*
-    // BUSQUEDA DE GENOMA DE REFERENCIA
-    // MODULE: Run Mash Dist
-    //
-    MASH_DIST (
-        ch_assembly_read,
-        params.mash_reference
-    )
-*/
+
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
@@ -187,18 +179,27 @@ workflow RESVIRPREDICTOR {
         ch_mash
     )
 
-    ch_filter_genome    = GENOME_COMPLETE_MATCH.out.best_complete_match
+    ch_filter_genome    = GENOME_COMPLETE_MATCH.out.match
+        ch_filter_genome
+            .collect{ it[1] }
+            .set { ch_to_genome }
 
     GENOME_FILTER_MATCH (
-        ch_filter_genome
+        [ id:"refseq" ],
+        ch_to_genome
     )
+
+    ch_common_genome    = GENOME_FILTER_MATCH.out.genome
+        ch_common_genome
+            .map { file -> file.text.trim() }
+            .set { ch_final_genome }
 
     // DESCARGA DE BASE DE DATOS DE REFERENCIA
     // MODULE: Run ncbi-genome-download
     //
     NCBIGENOMEDOWNLOAD (
         [ id:"refseq" ],
-        'GCF_000253135.1',
+        ch_final_genome,
         [],
         'bacteria'
     )
@@ -207,6 +208,15 @@ workflow RESVIRPREDICTOR {
             .collect{ it[1] }
             .set { ch_to_snippy }
 
+/*
+    // BUSQUEDA DE DISTANCIAS SEGUN GENOMA DE REFERENCIA
+    // MODULE: Run Mash Dist
+    //
+    MASH_DIST (
+        ch_assembly_read,
+        params.mash_reference
+    )
+*/
     // ESTUDIO DE FILOGENIA
     // MODULE: Run Snippy
     //

@@ -6,7 +6,7 @@ process GENOME_COMPLETE_MATCH {
     tuple val(meta), path(screen_file)
     
     output:
-    tuple val(meta), path("${prefix}.best_complete_match.tab"), emit: best_complete_match
+    tuple val(meta), path("${prefix}.best_complete_match.tab"), emit: match
 
     when:
     task.ext.when == null || task.ext.when
