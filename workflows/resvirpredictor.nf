@@ -31,6 +31,8 @@ include { ARIBA as ARIBA_RESFINDER                          } from '../subworkfl
 include { ARIBA as ARIBA_VFDB                               } from '../subworkflows/local/ariba'
 include { ARIBA as ARIBA_PLASMIDFINDER                      } from '../subworkflows/local/ariba'
 include { ARIBA as ARIBA_CARD                               } from '../subworkflows/local/ariba'
+include { GENOME_COMPLETE_MATCH                             } from '../subworkflows/local/search'
+include { GENOME_FILTER_MATCH                               } from '../subworkflows/local/search2'
 include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
@@ -159,7 +161,7 @@ workflow RESVIRPREDICTOR {
         [],
         []
     )
-
+/*
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Dist
     //
@@ -167,13 +169,28 @@ workflow RESVIRPREDICTOR {
         ch_assembly_read,
         params.mash_reference
     )
-
-    // BUSQUEDA DE CONTAMINANTES
+*/
+    // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
     MASH_SCREEN (
         ch_assembly_read,
         params.mash_reference
+    )
+
+    ch_mash        = MASH_SCREEN.out.screen
+        ch_mash
+            .collect{ it[1] }
+            .set { ch_to_genome }
+
+    GENOME_COMPLETE_MATCH (
+        ch_mash
+    )
+
+    ch_filter_genome    = GENOME_COMPLETE_MATCH.out.best_complete_match
+
+    GENOME_FILTER_MATCH (
+        ch_filter_genome
     )
 
     // DESCARGA DE BASE DE DATOS DE REFERENCIA

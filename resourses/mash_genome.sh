@@ -51,6 +51,30 @@ process_directory() {
     done
 }
 
+#process_files() {
+#    files=("$@")
+#    output_file_complete="mash_best_complete_match.txt"
+#    output_file_best="mash_best_match.txt"
+
+#    # Limpiar los archivos de salida si ya existen
+#    > "$output_file_complete"
+#    > "$output_file_best"
+    
+    # Iterar sobre todos los archivos screen.tab en la lista
+#    for screen_file in "${files[@]}"; do
+#        best_complete_match=$(return_best_complete_match "$screen_file")
+#        if [ -n "$best_complete_match" ]; then
+#            echo -e "$screen_file\t$best_complete_match" >> "$output_file_complete"
+#        fi
+        
+#        best_match=$(return_best_match "$screen_file")
+#        if [ -n "$best_match" ]; then
+#            echo -e "$screen_file\t$best_match" >> "$output_file_best"
+#        fi
+#    done
+#}
+
+
 find_common_reference() {
     folder=$1
     output_complete_tab="$folder/counter_complete_mash.tab"

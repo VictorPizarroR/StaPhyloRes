@@ -14,6 +14,7 @@ process MASH_SCREEN {
     output:
     tuple val(meta), path("*.screen.tab"), emit: screen
     path "versions.yml"              , emit: versions
+    path("*"), emit: folder
 
     when:
     task.ext.when == null || task.ext.when
