@@ -271,7 +271,7 @@ workflow RESVIRPREDICTOR {
                 )
     }
     // ESTUDIO MLST PARA STAPHYLOCOCCUS AUREUS
-    // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spatyper, SCCmec, agr Locus y Consolidar.
+    // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spatyper, SCCmec, agr Locus y Consolidar Tipados.
     //
     STAPTYPES (
         ch_assembly_read

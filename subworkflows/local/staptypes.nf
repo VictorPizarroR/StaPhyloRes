@@ -88,6 +88,9 @@ workflow STAPTYPES {
         'tsv',
         ''
     )
+    SUMMARY_SCCMEC.out.csv
+        .collect{ it[1] }
+        .set { ch_sccmec }
 
     SUMMARY_AGRVATE (
         ch_merge_agrvate,
@@ -104,6 +107,7 @@ workflow STAPTYPES {
         [ id:"staptypes-report" ],        
         ch_agr, 
         ch_mslt, 
-        ch_spatyper
+        ch_spatyper,
+        ch_sccmec
     )
 }
