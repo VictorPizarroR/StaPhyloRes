@@ -261,14 +261,18 @@ workflow RESVIRPREDICTOR {
     MASHTREE (
         ch_to_mashtree
     )
-/*
+
     // ESTUDIO DE FILOGENIA MEDIANTE SNP
     // MODULE: Gubbins
     //
-    GUBBINS (
-        ch_to_gubbins
-    )
-*/
+    if (params.gubbins) {
+            GUBBINS(
+                ch_to_gubbins
+                )
+    }
+    // ESTUDIO MLST PARA STAPHYLOCOCCUS AUREUS
+    // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spatyper, SCCmec, agr Locus y Consolidar.
+    //
     STAPTYPES (
         ch_assembly_read
     )

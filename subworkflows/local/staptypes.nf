@@ -1,5 +1,5 @@
 //
-// Subworkflow Obtener Tipados moleculares comunes MLST, Spatyper, SCCmec y agr Locus
+// Subworkflow Obtener Tipados moleculares comunes MLST, Spatyper, SCCmec, agr Locus y Consolidar.
 //
 
 /*
@@ -14,6 +14,7 @@ include { MLST					        } from '../../modules/nf-core/mlst/main'
 include { SPATYPER				        } from '../../modules/nf-core/spatyper/main'
 include { STAPHOPIASCCMEC		        } from '../../modules/nf-core/staphopiasccmec/main'
 include { AGRVATE                       } from '../../modules/nf-core/agrvate/main'
+include { SUMMARY_STAPHYLOCOCCUS_TYPE                                 } from '../../subworkflows/local/staptype_sum'
 include { CSVTK_CONCAT as SUMMARY_MLST                       } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as SUMMARY_SPATYPER                   } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as SUMMARY_SCCMEC                     } from '../../modules/nf-core/csvtk/concat/main'
@@ -60,13 +61,16 @@ workflow STAPTYPES {
         .map{ summary -> [[id:'agrvate-report'], summary]}
         .set{ ch_merge_agrvate }
 
-    //Merge Results
+    //RUN Summary por cada herramienta
     SUMMARY_MLST (
         ch_merge_mlst,
         'tsv',
         'tsv',
         '--no-header-row'
         )
+    SUMMARY_MLST.out.csv
+        .collect{ it[1] }
+        .set { ch_mslt }
     
     SUMMARY_SPATYPER (
         ch_merge_spatyper,
@@ -74,6 +78,9 @@ workflow STAPTYPES {
         'tsv',
         ''
     )
+    SUMMARY_SPATYPER.out.csv
+        .collect{ it[1] }
+        .set { ch_spatyper }
 
     SUMMARY_SCCMEC (
         ch_merge_sccmec,
@@ -87,5 +94,16 @@ workflow STAPTYPES {
         'tsv',
         'tsv',
         '-C "$"'
+    )
+    SUMMARY_AGRVATE.out.csv
+        .collect{ it[1] }
+        .set { ch_agr }
+
+    // RUN Summary Consolidado
+    SUMMARY_STAPHYLOCOCCUS_TYPE (
+        [ id:"staptypes-report" ],        
+        ch_agr, 
+        ch_mslt, 
+        ch_spatyper
     )
 }
