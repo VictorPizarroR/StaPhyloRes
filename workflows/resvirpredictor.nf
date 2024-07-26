@@ -9,6 +9,7 @@ include { paramsSummaryMap                          } from 'plugin/nf-validation
 include { UNICYCLER				                    } from '../modules/nf-core/unicycler/main'
 include { QUAST					                    } from '../modules/nf-core/quast/main'
 include { STARAMR_SEARCH                            } from '../modules/nf-core/staramr/search/main'
+include { CSVTK_CONCAT as SUMMARY_STARAMR           } from '../modules/nf-core/csvtk/concat/main'
 include { PROKKA                                    } from '../modules/nf-core/prokka/main'
 include { MASH_DIST                                 } from '../modules/nf-core/mash/dist/main'
 include { SNIPPY_RUN			                    } from '../modules/nf-core/snippy/run/main'
@@ -145,6 +146,15 @@ workflow RESVIRPREDICTOR {
     //
     STARAMR_SEARCH (
         ch_assembly_read
+    )
+
+    STARAMR_SEARCH.out.detailed_summary_tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staramr-report'], tsv]}.set{ ch_merge_staramr }
+
+    SUMMARY_STARAMR (
+        ch_merge_staramr,
+        'tsv',
+        'tsv',
+        ''
     )
 
     // ANOTACION
