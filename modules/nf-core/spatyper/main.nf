@@ -30,7 +30,7 @@ process SPATYPER {
         --fasta $fasta \\
         --output ${prefix}.tsv
 
-    echo -e "Strain\\tSequence name\\tRepeats\\tType" > ${prefix}_modified.tsv
+    echo -e "Sample\\tSequence name\\tRepeats\\tType" > ${prefix}_modified.tsv
     tail -n +2 ${prefix}.tsv | while IFS= read -r line; do
         echo -e "${meta.id}\\t\$line" >> ${prefix}_modified.tsv
     done

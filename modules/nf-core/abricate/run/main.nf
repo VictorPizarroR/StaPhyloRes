@@ -13,6 +13,7 @@ process ABRICATE_RUN {
 
     output:
     tuple val(meta), path("${meta.id}_${database}.txt"), emit: report
+    tuple val(meta), path("*.tsv"), emit: summary
     path "versions.yml"           , emit: versions
 
     when:
@@ -27,6 +28,14 @@ process ABRICATE_RUN {
         $assembly \\
         $args \\
         --threads $task.cpus > ${prefix}_${database}.txt
+
+    abricate \\
+        --summary \\
+        ${prefix}_${database}.txt > temp_${prefix}_${database}-summary.tsv
+
+    awk -v sample="${meta.id}" 'BEGIN {OFS="\\t"} NR==1 {print "Sample", \$0} NR>1 {print sample, \$0}' temp_${prefix}_${database}-summary.tsv > ${prefix}_${database}-summary.tsv
+
+    rm temp_${prefix}_${database}-summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

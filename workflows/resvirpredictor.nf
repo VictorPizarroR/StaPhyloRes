@@ -4,38 +4,36 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { MULTIQC                       } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap              } from 'plugin/nf-validation'
-include { UNICYCLER				        } from '../modules/nf-core/unicycler/main'
-include { QUAST					        } from '../modules/nf-core/quast/main'
-include { ABRICATE_RUN as ABRICATE_VFDB             } from '../modules/nf-core/abricate/run/main'
-include { ABRICATE_RUN as ABRICATE_STAPH            } from '../modules/nf-core/abricate/run/main'
-include { ABRICATE_SUMMARY as SUMMARY_VFDB                  } from '../modules/nf-core/abricate/summary/main'
-include { ABRICATE_SUMMARY as SUMMARY_STAPH                 } from '../modules/nf-core/abricate/summary/main'
-include { STARAMR_SEARCH                                } from '../modules/nf-core/staramr/search/main'
-include { PROKKA                        } from '../modules/nf-core/prokka/main'
-include { MASH_DIST                     } from '../modules/nf-core/mash/dist/main'
-include { SNIPPY_RUN			        } from '../modules/nf-core/snippy/run/main'
-include { SNIPPY_CORE			        } from '../modules/nf-core/snippy/core/main'
-include { MASHTREE                      } from '../modules/nf-core/mashtree/main'
-include { IQTREE				        } from '../modules/nf-core/iqtree/main'
-include { MYKROBE_PREDICT		        } from '../modules/nf-core/mykrobe/predict/main'
-include { CSVTK_CONCAT as SUMMARY_MYKROBE                    } from '../modules/nf-core/csvtk/concat/main'
-include { MASH_SKETCH as SKETCH_REFERENCE               } from '../modules/nf-core/mash/sketch/main'
-include { MASH_SCREEN                   } from '../modules/nf-core/mash/screen/main'
-include { GUBBINS                       } from '../modules/nf-core/gubbins/main'
-include { NCBIGENOMEDOWNLOAD } from '../modules/nf-core/ncbigenomedownload/main'
-include { FASTQ_TRIM_FASTP_FASTQC       } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
-include { STAPTYPES                     } from '../subworkflows/local/staptypes'
-include { ARIBA as ARIBA_RESFINDER                          } from '../subworkflows/local/ariba'
-include { ARIBA as ARIBA_VFDB                               } from '../subworkflows/local/ariba'
-include { ARIBA as ARIBA_PLASMIDFINDER                      } from '../subworkflows/local/ariba'
-include { ARIBA as ARIBA_CARD                               } from '../subworkflows/local/ariba'
-include { GENOME_COMPLETE_MATCH                             } from '../subworkflows/local/search'
-include { GENOME_FILTER_MATCH                               } from '../subworkflows/local/search2'
-include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { MULTIQC                                   } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                          } from 'plugin/nf-validation'
+include { UNICYCLER				                    } from '../modules/nf-core/unicycler/main'
+include { QUAST					                    } from '../modules/nf-core/quast/main'
+include { STARAMR_SEARCH                            } from '../modules/nf-core/staramr/search/main'
+include { PROKKA                                    } from '../modules/nf-core/prokka/main'
+include { MASH_DIST                                 } from '../modules/nf-core/mash/dist/main'
+include { SNIPPY_RUN			                    } from '../modules/nf-core/snippy/run/main'
+include { SNIPPY_CORE			                    } from '../modules/nf-core/snippy/core/main'
+include { MASHTREE                                  } from '../modules/nf-core/mashtree/main'
+include { IQTREE				                    } from '../modules/nf-core/iqtree/main'
+include { MYKROBE_PREDICT		                    } from '../modules/nf-core/mykrobe/predict/main'
+include { CSVTK_CONCAT as SUMMARY_MYKROBE           } from '../modules/nf-core/csvtk/concat/main'
+include { MASH_SCREEN                               } from '../modules/nf-core/mash/screen/main'
+include { GUBBINS                                   } from '../modules/nf-core/gubbins/main'
+include { NCBIGENOMEDOWNLOAD                        } from '../modules/nf-core/ncbigenomedownload/main'
+include { FASTQ_TRIM_FASTP_FASTQC                   } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
+include { STAPTYPES                                 } from '../subworkflows/local/staptypes'
+include { ARIBA as ARIBA_RESFINDER                  } from '../subworkflows/local/ariba'
+include { ARIBA as ARIBA_VFDB                       } from '../subworkflows/local/ariba'
+include { ARIBA as ARIBA_PLASMIDFINDER              } from '../subworkflows/local/ariba'
+include { ARIBA as ARIBA_CARD                       } from '../subworkflows/local/ariba'
+include { ABRICATE as ABRICATE_VFDB                 } from '../subworkflows/local/abricate'
+include { ABRICATE as ABRICATE_STAPH                } from '../subworkflows/local/abricate'
+include { ABRICATE as ABRICATE_RESFINDER            } from '../subworkflows/local/abricate'
+include { GENOME_COMPLETE_MATCH                     } from '../subworkflows/local/search'
+include { GENOME_FILTER_MATCH                       } from '../subworkflows/local/search2'
+include { paramsSummaryMultiqc                      } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML                    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText                    } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -126,33 +124,29 @@ workflow RESVIRPREDICTOR {
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
     // MODULE: Run Multiples databases Abricate
     //
-    ABRICATE_STAPH (
-        ch_assembly_read,
-        "staph"
-    )
-    ABRICATE_STAPH.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate-staph'], report]}.set{ ch_merge_abricate_staph }
-
-    SUMMARY_STAPH (
-        ch_merge_abricate_staph
-        )
+    if (params.abricate_db) {
+        ABRICATE_STAPH (
+            ch_assembly_read,
+            "staph"
+            )
+    }
 
     ABRICATE_VFDB (
         ch_assembly_read,
         "vfdb"
     )
 
-    ABRICATE_VFDB.out.report.collect{meta, report -> report}.map{ report -> [[id:'abricate-vfdb'], report]}.set{ ch_merge_abricate_vfdb }
-    
-    SUMMARY_VFDB (
-        ch_merge_abricate_vfdb
-        )
-/*
+    ABRICATE_RESFINDER (
+        ch_assembly_read,
+        "resfinder"
+    )
+
     // MODULE: Run Multiples databases Staramr Search
     //
     STARAMR_SEARCH (
         ch_assembly_read
     )
-*/    
+
     // ANOTACION
     // MODULE: Prokka
     //

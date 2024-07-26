@@ -11,7 +11,7 @@ process ABRICATE_SUMMARY {
     tuple val(meta), path(reports)
 
     output:
-    tuple val(meta), path("*.txt"), emit: report
+    tuple val(meta), path("*.tsv"), emit: report
     path "versions.yml"           , emit: versions
 
     when:
@@ -23,7 +23,7 @@ process ABRICATE_SUMMARY {
     """
     abricate \\
         --summary \\
-        $reports > ${prefix}.txt
+        $reports > ${prefix}.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
