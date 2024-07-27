@@ -148,7 +148,7 @@ workflow RESVIRPREDICTOR {
         ch_assembly_read
     )
 
-    STARAMR_SEARCH.out.detailed_summary_tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staramr-report'], tsv]}.set{ ch_merge_staramr }
+    STARAMR_SEARCH.out.detailed_summary_tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staramr-summary'], tsv]}.set{ ch_merge_staramr }
 
     SUMMARY_STARAMR (
         ch_merge_staramr,
