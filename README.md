@@ -17,7 +17,7 @@
 
 [![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23resvirpredictor-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/resvirpredictor)[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
 
-## Introduction
+## Introduccion
 
 **nf-core/resvirpredictor** is a bioinformatics pipeline that ...
 
@@ -33,46 +33,112 @@ Trabajo de Fin de Máster, Máster Universitario en Bioinformática, Universidad
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
 <!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
+## Herramientas
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 
-## Usage
+
+## Workflow
+
+## Modo de Uso
 
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
 
-First, prepare a samplesheet with your input data that looks as follows:
+
+Primero, prepara una samplesheet con las secuencias R1 y R2, la cual debe ser similar a esta:
 
 `samplesheet.csv`:
 
 ```csv
 sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+IDENTIFICADOR,XXXXXXX_XX_L002_R1_001.fastq.gz,XXXXXXX_XX_L002_R2_001.fastq.gz
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
-
--->
-
-Now, you can run the pipeline using:
-
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
+Puedes utilizar el script contenido en la carpeta: 
+`Resources`
 
 ```bash
-nextflow run nf-core/resvirpredictor \
-   -profile <conda/hpc/> \
-   --input samplesheet.csv \
-   --outdir <OUTDIR>
+./Crear_CSV.bash inputdir/ samplesheet.csv
 ```
 
-> [!WARNING]
-> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
-> see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
+Cada fila representa un par de archivos fastq (paired end).
 
-For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/resvirpredictor/usage) and the [parameter documentation](https://nf-co.re/resvirpredictor/parameters).
+--> Uso exclusivo desde entorno CONDA.
+## Preparacion
+
+Crear un entorno de CONDA a partir de archivo YML proporcionado, nombrarlo.
+
+```bash
+conda env create -f TFM-Resvirpredictor/resourses/environmetariba.yml --name env_name
+```
+
+Activar entorno.
+
+# Run Basico:
+
+```bash
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ 
+```
+Analisis Base:
+- Analisis de calidad de secuencias raw
+- Trimado
+- Analisis de calidad de secuencias trimadas
+- Ensamblado
+- Analisis de calidad de ensamblados
+- Busqueda de genes de resistencia y virulencia en secuencias cortas
+- Busqueda de genes de resistencia y virulencia en ensamblados
+- Estudio MLST para Staphylococcus aureus
+- Prediccion de resistencia fenoticipa a travez de analisis genomico
+- Informes consolidades de resultados
+
+# Profiles disponibles:
+
+HPC
+- Optimizado para uso por slurm
+
+Ejemplo: 
+
+```bash
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile hpc
+```
+
+
+# Analisis opcionales/complementarios 
+# BD personalizada
+El pipeline se encuentra configurado para el uso de la base de datos personalizada "staph_vf.fasta", contenida en el directorio Resources, para su uso, se requiere la sgte preparacion:
+
+## Pasos Previos
+Agregar BD personalizada a Abricate
+Verificar path a base de datos de abricate:
+```bash
+abricate --datadir
+```
+crear carpeta staph en directorio de BD
+
+Copiar archivo staph_vf.fasta a directorio
+
+```bash
+cp TFM-Resvirpredictor/resourses/staph_vf.fasta /pathtobd/staph/sequences
+
+abricate --setupdb
+```
+
+```bash
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
+```
+
+# Estudio de filogenia
+El pipeline es capaz de obtener una base de datos de referencia optima segun las secuencias entregadas al compararla con la base de datos facilitada por MASH.
+
+## Paso Previo
+
+1. Descargar BD desde sitio oficial https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
+
+```bash
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --filogeny true --mash_reference pathtomashreference.msh
+```
 
 ## Pipeline output
 
