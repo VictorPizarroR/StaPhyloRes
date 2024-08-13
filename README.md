@@ -65,8 +65,7 @@ Puedes utilizar el script contenido en la carpeta:
 
 Cada fila representa un par de archivos fastq (paired end).
 
---> Uso exclusivo desde entorno CONDA.
-## Preparacion
+# Preparacion
 
 Crear un entorno de CONDA a partir de archivo YML proporcionado, nombrarlo.
 
@@ -76,7 +75,7 @@ conda env create -f TFM-Resvirpredictor/resourses/environmetariba.yml --name env
 
 Activar entorno.
 
-# Run Basico:
+## Run Basico:
 
 ```bash
 nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ 
@@ -93,7 +92,7 @@ Analisis Base:
 - Prediccion de resistencia fenoticipa a travez de analisis genomico
 - Informes consolidades de resultados
 
-# Profiles disponibles:
+## Profiles disponibles:
 
 HPC
 - Optimizado para uso por slurm
@@ -106,7 +105,7 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
 
 
 # Analisis opcionales/complementarios 
-# BD personalizada
+## BD personalizada
 El pipeline se encuentra configurado para el uso de la base de datos personalizada "staph_vf.fasta", contenida en el directorio Resources, para su uso, se requiere la sgte preparacion:
 
 ## Pasos Previos
@@ -129,7 +128,7 @@ abricate --setupdb
 nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
 ```
 
-# Estudio de filogenia
+## Estudio de filogenia
 El pipeline es capaz de obtener una base de datos de referencia optima segun las secuencias entregadas al compararla con la base de datos facilitada por MASH.
 
 ## Paso Previo
