@@ -169,110 +169,113 @@ workflow RESVIRPREDICTOR {
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
-    MASH_SCREEN (
-        ch_assembly_read,
-        params.mash_reference
-    )
-
-    ch_mash        = MASH_SCREEN.out.screen
-        ch_mash
-            .collect{ it[1] }
-            .set { ch_to_genome }
-
-    GENOME_COMPLETE_MATCH (
-        ch_mash
-    )
-
-    ch_filter_genome    = GENOME_COMPLETE_MATCH.out.match
-        ch_filter_genome
-            .collect{ it[1] }
-            .set { ch_to_genome }
-
-    GENOME_FILTER_MATCH (
-        [ id:"refseq" ],
-        ch_to_genome
-    )
-
-    ch_common_genome    = GENOME_FILTER_MATCH.out.genome
-        ch_common_genome
-            .map { file -> file.text.trim() }
-            .set { ch_final_genome }
-
-    // DESCARGA DE BASE DE DATOS DE REFERENCIA
-    // MODULE: Run ncbi-genome-download
-    //
-    NCBIGENOMEDOWNLOAD (
-        [ id:"refseq" ],
-        ch_final_genome,
-        [],
-        'bacteria'
-    )
-    ch_refseq           = NCBIGENOMEDOWNLOAD.out.gbk
-        ch_refseq
-            .collect{ it[1] }
-            .set { ch_to_snippy }
-
-/*
-    // BUSQUEDA DE DISTANCIAS SEGUN GENOMA DE REFERENCIA
-    // MODULE: Run Mash Dist
-    //
-    MASH_DIST (
-        ch_assembly_read,
-        params.mash_reference
-    )
-*/
-    // ESTUDIO DE FILOGENIA
-    // MODULE: Run Snippy
-    //
-    SNIPPY_RUN (
-        ch_trim_fastp,
-        ch_to_snippy
-    )
-
-    // PREPARACION DE CHANNELS
-    SNIPPY_RUN.out.vcf.collect{meta, vcf -> vcf}.map{ vcf -> [[id:'snp-core'], vcf]}.set{ ch_merge_vcf }
-    SNIPPY_RUN.out.aligned_fa.collect{meta, aligned_fa -> aligned_fa}.map{ aligned_fa -> [[id:'snp-core'], aligned_fa]}.set{ ch_merge_aligned_fa }
-    ch_merge_vcf.join( ch_merge_aligned_fa ).set{ ch_snippy_core }
-
-    // ESTUDIO DE FILOGENIA MEDIANTE SNP
-    // MODULE: Run Snippy Core
-    //
-    SNIPPY_CORE (
-        ch_snippy_core,
-        ch_to_snippy
-    )
-    ch_iqtree        = SNIPPY_CORE.out.aln
-        ch_iqtree
-            .collect{ it[1] }
-            .set { ch_to_gubbins }
-
-    // ESTUDIO DE FILOGENIA MEDIANTE SNP
-    // MODULE: IQTree
-    //
-    IQTREE (
-        ch_iqtree,
-        []
-    )
-
-    // ESTUDIO DE DISTANCIA ENTRE ENSAMBLADOS
-    // MODULE: IQTree
-    //
-     ch_assembly_read
-        .collect{ it[1] }
-        .map { consensus_collect -> tuple([id: "aligments"], consensus_collect) }
-        .set { ch_to_mashtree }
+    if (params.filogeny) {
+        MASH_SCREEN (
+            ch_assembly_read,
+            params.mash_reference
+            )
     
-    MASHTREE (
-        ch_to_mashtree
-    )
 
-    // ESTUDIO DE FILOGENIA MEDIANTE SNP
-    // MODULE: Gubbins
-    //
-    if (params.gubbins) {
-            GUBBINS(
-                ch_to_gubbins
-                )
+        ch_mash        = MASH_SCREEN.out.screen
+            ch_mash
+                .collect{ it[1] }
+                .set { ch_to_genome }
+
+        GENOME_COMPLETE_MATCH (
+            ch_mash
+        )
+
+        ch_filter_genome    = GENOME_COMPLETE_MATCH.out.match
+            ch_filter_genome
+                .collect{ it[1] }
+                .set { ch_to_genome }
+
+        GENOME_FILTER_MATCH (
+            [ id:"refseq" ],
+            ch_to_genome
+        )
+
+        ch_common_genome    = GENOME_FILTER_MATCH.out.genome
+            ch_common_genome
+                .map { file -> file.text.trim() }
+                .set { ch_final_genome }
+
+        // DESCARGA DE BASE DE DATOS DE REFERENCIA
+        // MODULE: Run ncbi-genome-download
+        //
+        NCBIGENOMEDOWNLOAD (
+            [ id:"refseq" ],
+            ch_final_genome,
+            [],
+            'bacteria'
+        )
+        ch_refseq           = NCBIGENOMEDOWNLOAD.out.gbk
+            ch_refseq
+                .collect{ it[1] }
+                .set { ch_to_snippy }
+
+    /*
+        // BUSQUEDA DE DISTANCIAS SEGUN GENOMA DE REFERENCIA
+        // MODULE: Run Mash Dist
+        //
+        MASH_DIST (
+            ch_assembly_read,
+            params.mash_reference
+        )
+    */
+        // ESTUDIO DE FILOGENIA
+        // MODULE: Run Snippy
+        //
+        SNIPPY_RUN (
+            ch_trim_fastp,
+            ch_to_snippy
+        )
+
+        // PREPARACION DE CHANNELS
+        SNIPPY_RUN.out.vcf.collect{meta, vcf -> vcf}.map{ vcf -> [[id:'snp-core'], vcf]}.set{ ch_merge_vcf }
+        SNIPPY_RUN.out.aligned_fa.collect{meta, aligned_fa -> aligned_fa}.map{ aligned_fa -> [[id:'snp-core'], aligned_fa]}.set{ ch_merge_aligned_fa }
+        ch_merge_vcf.join( ch_merge_aligned_fa ).set{ ch_snippy_core }
+
+        // ESTUDIO DE FILOGENIA MEDIANTE SNP
+        // MODULE: Run Snippy Core
+        //
+        SNIPPY_CORE (
+            ch_snippy_core,
+            ch_to_snippy
+        )
+        ch_iqtree        = SNIPPY_CORE.out.aln
+            ch_iqtree
+                .collect{ it[1] }
+                .set { ch_to_gubbins }
+
+        // ESTUDIO DE FILOGENIA MEDIANTE SNP
+        // MODULE: IQTree
+        //
+        IQTREE (
+            ch_iqtree,
+            []
+        )
+
+        // ESTUDIO DE DISTANCIA ENTRE ENSAMBLADOS
+        // MODULE: IQTree
+        //
+        ch_assembly_read
+            .collect{ it[1] }
+            .map { consensus_collect -> tuple([id: "aligments"], consensus_collect) }
+            .set { ch_to_mashtree }
+    
+        MASHTREE (
+            ch_to_mashtree
+        )
+
+        // ESTUDIO DE FILOGENIA MEDIANTE SNP
+        // MODULE: Gubbins
+        //
+        if (params.gubbins) {
+                GUBBINS(
+                    ch_to_gubbins
+                    )
+        }
     }
     // ESTUDIO MLST PARA STAPHYLOCOCCUS AUREUS
     // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spa-type, SCCmec, agr Locus y Consolidar Tipados.

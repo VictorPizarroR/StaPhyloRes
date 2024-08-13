@@ -63,7 +63,7 @@ Now, you can run the pipeline using:
 
 ```bash
 nextflow run nf-core/resvirpredictor \
-   -profile <docker/singularity/.../institute> \
+   -profile <conda/hpc/> \
    --input samplesheet.csv \
    --outdir <OUTDIR>
 ```
