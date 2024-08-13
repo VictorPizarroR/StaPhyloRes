@@ -70,7 +70,7 @@ Cada fila representa un par de archivos fastq (paired end).
 Crear un entorno de CONDA a partir de archivo YML proporcionado, nombrarlo.
 
 ```bash
-conda env create -f TFM-Resvirpredictor/resourses/environmetariba.yml --name env_name
+conda env create -f TFM-Resvirpredictor/resourses/resvirpredictor.yml --name env_name
 ```
 
 Activar entorno.
