@@ -10,10 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input",
-                "outdir"
-            ],
+            "required": ["input", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -32,13 +29,22 @@
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "abricate_db": {
+                    "type": "boolean",
+                    "description": "It uses a custom database previously configured in a conda environment, under the name \"staph\".",
+                    "fa_icon": "fas fa-desktop"
+                },
+                "gubbins": {
+                    "type": "boolean",
+                    "description": "Alternative to snippy",
+                    "fa_icon": "fab fa-stack-exchange"
+                },
                 "email": {
                     "type": "string",
                     "description": "Email address for completion summary.",
                     "fa_icon": "fas fa-envelope",
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
-                    "hidden": true
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 },
                 "multiqc_title": {
                     "type": "string",
@@ -48,108 +54,21 @@
                 }
             }
         },
-        "qc_and_trim": {
-            "title": "QC and trim",
-            "type": "object",
-            "default": "",
-            "fa_icon": "fas fa-cut",
-            "properties": {
-                "skip_fastqc": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-forward",
-                    "description": "Skip FastQC"
-                },
-                "skip_fastp": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-forward",
-                    "description": "Skip FastP"
-                }
-            },
-            "description": "Define params for QC and trim reads"
-        },
-        "assembly_parameters": {
-            "title": "Assembly parameters",
-            "type": "object",
-            "description": "Parameters for the assembly (Unicyler)",
-            "default": "",
-            "properties": {
-                "assembly_type": {
-                    "type": "string",
-                    "default": "short",
-                    "help_text": "This adjusts the type of assembly done with the input data and can be any of `long`, `short` or `hybrid`.",
-                    "description": "Which type of assembly to perform",
-                    "enum": [
-                        "short",
-                        "long",
-                        "hybrid"
-                    ],
-                    "fa_icon": "fas fa-tags"
-                },
-                "unicycler_mode": {
-                    "type": "string",
-                    "description": "Mode arguments for Unicycler",
-                    "fa_icon": "fas fa-indent",
-                    "enum": [
-                        "\u2011\u2011mode conservative",
-                        "\u2011\u2011mode normal",
-                        "\u2011\u2011mode bold"
-                    ],
-                    "help_text": "For this to work you need to quote the arguments and add at least one space"
-                },
-                "assembly_skip": {
-                    "type": "boolean",
-                    "description": "Skip assembly",
-                    "fa_icon": "fas fa-forward"
-                }
-            },
-            "fa_icon": "fas fa-puzzle-piece"
-        },
-        "ariba_database_selection": {
-            "title": "Ariba database selection",
-            "type": "object",
-            "description": "Select Ariba databases for analysis.",
-            "default": "",
-            "fa_icon": "fas fa-search",
-            "properties": {
-                "vfdb_core_enabled": {
-                    "type": "boolean",
-                    "description": "Enable Vfdb_core Database",
-                    "default": true,
-                    "fa_icon": "fas fa-viruses"
-                },
-                "plasmidfinder_enabled": {
-                    "type": "boolean",
-                    "description": "Enable Plasmidfinder Database",
-                    "default": true,
-                    "fa_icon": "far fa-circle"
-                },
-                "resfinder_enabled": {
-                    "type": "boolean",
-                    "description": "Enable Resfinder Database",
-                    "default": true,
-                    "fa_icon": "fas fa-bacterium"
-                },
-                "skip_all": {
-                    "type": "boolean",
-                    "description": "Skip all Ariba database analysis.",
-                    "fa_icon": "fas fa-forward"
-                }
-            }
-        },
-        "reference_genome_options": {
-            "title": "Snuppy genome options",
+        "filogeny_study": {
+            "title": "Filogeny Study",
             "type": "object",
             "fa_icon": "fas fa-dna",
             "description": "Reference genome related files and options required for the workflow.",
             "properties": {
-                "fasta": {
+                "filogeny": {
+                    "type": "boolean",
+                    "help_text": "If value is true, you must point the full route to your mash reference file, obtained from https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh",
+                    "fa_icon": "fas fa-wrench"
+                },
+                "mash_reference": {
                     "type": "string",
-                    "format": "file-path",
-                    "exists": true,
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gbk)?$",
-                    "description": "Path to GBK genome file.",
-                    "fa_icon": "far fa-file-code"
+                    "description": "Path to .msh genome file.",
+                    "fa_icon": "fas fa-box-open"
                 }
             }
         },
@@ -211,14 +130,14 @@
                 "max_cpus": {
                     "type": "integer",
                     "description": "Maximum number of CPUs that can be requested for any single job.",
-                    "default": 8,
+                    "default": 16,
                     "fa_icon": "fas fa-microchip",
                     "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
                 },
                 "max_memory": {
                     "type": "string",
                     "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "64.GB",
+                    "default": "12.GB",
                     "fa_icon": "fas fa-memory",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
@@ -249,8 +168,7 @@
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
+                    "fa_icon": "fas fa-question-circle"
                 },
                 "publish_dir_mode": {
                     "type": "string",
@@ -258,14 +176,7 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -358,16 +269,7 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/qc_and_trim"
-        },
-        {
-            "$ref": "#/definitions/assembly_parameters"
-        },
-        {
-            "$ref": "#/definitions/ariba_database_selection"
-        },
-        {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/definitions/filogeny_study"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

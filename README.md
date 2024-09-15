@@ -94,13 +94,12 @@ Analisis Base:
 
 ## Profiles disponibles:
 
-HPC
-- Optimizado para uso por slurm
+CONDA
 
 Ejemplo: 
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile hpc
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile conda
 ```
 
 
