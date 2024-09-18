@@ -54,6 +54,40 @@
                 }
             }
         },
+        "skipping_options": {
+            "title": "Skipping Options",
+            "type": "object",
+            "description": "Define skip modules from pipeline",
+            "default": "",
+            "properties": {
+                "skip_unycicler": {
+                    "type": "boolean",
+                    "description": "Skip Unyciler",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "skip_resvir": {
+                    "type": "boolean",
+                    "description": "Skip Ariba, Abricate & Staramr analisis",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip MultiQC"
+                },
+                "skip_mykrobe": {
+                    "type": "boolean",
+                    "description": "Skip Mykrobe",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "skip_mlst": {
+                    "type": "boolean",
+                    "description": "Skip MLST Study",
+                    "fa_icon": "fas fa-fast-forward"
+                }
+            },
+            "fa_icon": "fas fa-forward"
+        },
         "filogeny_study": {
             "title": "Filogeny Study",
             "type": "object",
@@ -148,8 +182,7 @@
                     "default": "240.h",
                     "fa_icon": "far fa-clock",
                     "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`",
-                    "hidden": true
+                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
                 }
             }
         },
@@ -267,6 +300,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/skipping_options"
         },
         {
             "$ref": "#/definitions/filogeny_study"

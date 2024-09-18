@@ -80,11 +80,12 @@ workflow RESVIRPREDICTOR {
     // ENSAMBALDO
     // MODULE: Run Unicycler
     //
-    UNICYCLER (
-        ch_unicycler
-    )
-    ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
-
+    if ( !params.skip_unycicler ) {
+        UNICYCLER (
+            ch_unicycler
+        )
+        ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
+    }
     // ANALISIS DE CALIDAD ENSAMBLADO
     // MODULE: Run Quast
     //
@@ -102,61 +103,62 @@ workflow RESVIRPREDICTOR {
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
     //
-    ARIBA_RESFINDER (
-        ch_trim_fastp,
-        'resfinder'
-    )
+    if ( !params.skip_resvir ) {
+        ARIBA_RESFINDER (
+            ch_trim_fastp,
+            'resfinder'
+        )
 
-    ARIBA_PLASMIDFINDER (
-        ch_trim_fastp,
-        'plasmidfinder'
-    )
+        ARIBA_PLASMIDFINDER (
+            ch_trim_fastp,
+            'plasmidfinder'
+        )
 
-    ARIBA_CARD (
-        ch_trim_fastp,
-        'card'
-    )
+        ARIBA_CARD (
+            ch_trim_fastp,
+            'card'
+        )
 
-    ARIBA_VFDB (
-        ch_trim_fastp,
-        'vfdb_core'
-    )
+        ARIBA_VFDB (
+            ch_trim_fastp,
+            'vfdb_core'
+        )
     
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
     // MODULE: Run Multiples databases Abricate
     //
-    if (params.abricate_db) {
-        ABRICATE_STAPH (
+        if (params.abricate_db) {
+            ABRICATE_STAPH (
+                ch_assembly_read,
+                "staph"
+                )
+        }
+
+        ABRICATE_VFDB (
             ch_assembly_read,
-            "staph"
-            )
-    }
+            "vfdb"
+        )
 
-    ABRICATE_VFDB (
-        ch_assembly_read,
-        "vfdb"
-    )
-
-    ABRICATE_RESFINDER (
-        ch_assembly_read,
-        "resfinder"
-    )
+        ABRICATE_RESFINDER (
+            ch_assembly_read,
+            "resfinder"
+        )
 
     // MODULE: Run Multiples databases Staramr Search
     //
-    STARAMR_SEARCH (
-        ch_assembly_read
-    )
+        STARAMR_SEARCH (
+            ch_assembly_read
+        )
 
-    STARAMR_SEARCH.out.detailed_summary_tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staramr-summary'], tsv]}.set{ ch_merge_staramr }
+        STARAMR_SEARCH.out.detailed_summary_tsv.collect{meta, tsv -> tsv}.map{ tsv -> [[id:'staramr-summary'], tsv]}.set{ ch_merge_staramr }
 
-    SUMMARY_STARAMR (
-        ch_merge_staramr,
-        'tsv',
-        'tsv',
-        ''
-    )
-
+        SUMMARY_STARAMR (
+            ch_merge_staramr,
+            'tsv',
+            'tsv',
+            ''
+        )
+    }
     // ANOTACION
     // MODULE: Prokka
     //
@@ -280,27 +282,29 @@ workflow RESVIRPREDICTOR {
     // ESTUDIO MLST PARA STAPHYLOCOCCUS AUREUS
     // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spa-type, SCCmec, agr Locus y Consolidar Tipados.
     //
-    STAPTYPES (
-        ch_assembly_read
-    )
-
+    if ( !params.skip_mlst ) {
+        STAPTYPES (
+            ch_assembly_read
+        )
+    }
     // PREDICCION DE RESISTENCIA
     // MODULE: Run Mykrobe
     //
-    MYKROBE_PREDICT (
-        ch_trim_fastp,
-        'staph'
-    )
+    if ( !params.skip_mykrobe ) {
+        MYKROBE_PREDICT (
+            ch_trim_fastp,
+            'staph'
+        )
 
-    MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
+        MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
     
-    SUMMARY_MYKROBE (
-        ch_merge_mykrobe,
-        'csv',
-        'csv',
-        ''
-    )
-
+        SUMMARY_MYKROBE (
+            ch_merge_mykrobe,
+            'csv',
+            'csv',
+            ''
+        )
+    }
     //
     // Collate and save software versions
     //
@@ -311,28 +315,30 @@ workflow RESVIRPREDICTOR {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_config                     = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-    ch_multiqc_custom_config              = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
-    ch_multiqc_logo                       = params.multiqc_logo ? Channel.fromPath(params.multiqc_logo, checkIfExists: true) : Channel.empty()
-    summary_params                        = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
-    ch_workflow_summary                   = Channel.value(paramsSummaryMultiqc(summary_params))
-    ch_multiqc_custom_methods_description = params.multiqc_methods_description ? file(params.multiqc_methods_description, checkIfExists: true) : file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
-    ch_methods_description                = Channel.value(methodsDescriptionText(ch_multiqc_custom_methods_description))
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_collated_versions)
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml', sort: false))
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_trim_json_multiqc.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
+    if ( !params.skip_multiqc ) {
+        ch_multiqc_config                     = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+        ch_multiqc_custom_config              = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+        ch_multiqc_logo                       = params.multiqc_logo ? Channel.fromPath(params.multiqc_logo, checkIfExists: true) : Channel.empty()
+        summary_params                        = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
+        ch_workflow_summary                   = Channel.value(paramsSummaryMultiqc(summary_params))
+        ch_multiqc_custom_methods_description = params.multiqc_methods_description ? file(params.multiqc_methods_description, checkIfExists: true) : file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+        ch_methods_description                = Channel.value(methodsDescriptionText(ch_multiqc_custom_methods_description))
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_collated_versions)
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml', sort: false))
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_trim_json_multiqc.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
 
-    MULTIQC (
-        ch_multiqc_files.collect(),
-        ch_multiqc_config.toList(),
-        ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList()
-    )
-
+    
+        MULTIQC (
+            ch_multiqc_files.collect(),
+            ch_multiqc_config.toList(),
+            ch_multiqc_custom_config.toList(),
+            ch_multiqc_logo.toList()
+        )
+    }
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
