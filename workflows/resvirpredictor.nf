@@ -316,7 +316,6 @@ workflow RESVIRPREDICTOR {
     //
     // MODULE: MultiQC
     //
-    if ( !params.skip_multiqc ) {
         ch_multiqc_config                     = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
         ch_multiqc_custom_config              = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
         ch_multiqc_logo                       = params.multiqc_logo ? Channel.fromPath(params.multiqc_logo, checkIfExists: true) : Channel.empty()
@@ -340,10 +339,11 @@ workflow RESVIRPREDICTOR {
             ch_multiqc_custom_config.toList(),
             ch_multiqc_logo.toList()
         )
-    }
+    
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
+    
 }
 
 /*

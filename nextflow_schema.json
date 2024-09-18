@@ -75,11 +75,6 @@
                     "description": "Skip Abricate & Stararm analisis",
                     "fa_icon": "fas fa-fast-forward"
                 },
-                "skip_multiqc": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip MultiQC"
-                },
                 "skip_mykrobe": {
                     "type": "boolean",
                     "description": "Skip Mykrobe",
