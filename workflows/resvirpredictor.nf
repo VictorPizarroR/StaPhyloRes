@@ -85,7 +85,7 @@ workflow RESVIRPREDICTOR {
             ch_unicycler
         )
         ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
-    }
+    
     // ANALISIS DE CALIDAD ENSAMBLADO
     // MODULE: Run Quast
     //
@@ -99,11 +99,11 @@ workflow RESVIRPREDICTOR {
         [[:],[]]
     )
     ch_quast_multiqc = QUAST.out.tsv
-
+    }
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
     //
-    if ( !params.skip_resvir ) {
+    if ( !params.skip_ariba ) {
         ARIBA_RESFINDER (
             ch_trim_fastp,
             'resfinder'
@@ -123,15 +123,16 @@ workflow RESVIRPREDICTOR {
             ch_trim_fastp,
             'vfdb_core'
         )
-    
+    }
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
     // MODULE: Run Multiples databases Abricate
     //
-        if (params.abricate_db) {
-            ABRICATE_STAPH (
-                ch_assembly_read,
-                "staph"
-                )
+    if ( !params.skip_assemblyanalisis && !params.skip_unycicler ) {
+    if (params.abricate_db) {
+        ABRICATE_STAPH (
+            ch_assembly_read,
+            "staph"
+            )
         }
 
         ABRICATE_VFDB (
@@ -143,7 +144,6 @@ workflow RESVIRPREDICTOR {
             ch_assembly_read,
             "resfinder"
         )
-
     // MODULE: Run Multiples databases Staramr Search
     //
         STARAMR_SEARCH (
@@ -162,12 +162,13 @@ workflow RESVIRPREDICTOR {
     // ANOTACION
     // MODULE: Prokka
     //
+    if (!params.skip_unycicler ) {
     PROKKA (
         ch_assembly_read,
         [],
         []
     )
-
+    }
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
@@ -282,7 +283,7 @@ workflow RESVIRPREDICTOR {
     // ESTUDIO MLST PARA STAPHYLOCOCCUS AUREUS
     // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spa-type, SCCmec, agr Locus y Consolidar Tipados.
     //
-    if ( !params.skip_mlst ) {
+    if ( !params.skip_mlst && !params.skip_unycicler ) {
         STAPTYPES (
             ch_assembly_read
         )
@@ -329,8 +330,9 @@ workflow RESVIRPREDICTOR {
         ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files                      = ch_multiqc_files.mix(ch_trim_json_multiqc.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
-
+        if ( !params.skip_unycicler ) {
+            ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
+        }
     
         MULTIQC (
             ch_multiqc_files.collect(),

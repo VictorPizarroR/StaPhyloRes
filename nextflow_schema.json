@@ -65,9 +65,14 @@
                     "description": "Skip Unyciler",
                     "fa_icon": "fas fa-fast-forward"
                 },
-                "skip_resvir": {
+                "skip_ariba": {
                     "type": "boolean",
-                    "description": "Skip Ariba, Abricate & Staramr analisis",
+                    "description": "Skip Ariba analisis",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "skip_assemblyanalisis": {
+                    "type": "boolean",
+                    "description": "Skip Abricate & Stararm analisis",
                     "fa_icon": "fas fa-fast-forward"
                 },
                 "skip_multiqc": {
