@@ -77,16 +77,16 @@ workflow RESVIRPREDICTOR {
             .set { ch_unicycler }
         ch_versions             = ch_versions.mix(FASTQ_TRIM_FASTP_FASTQC.out.versions)
     
-    // ENSAMBALDO
+    // ENSAMBLADO
     // MODULE: Run Unicycler
     //
-    if ( !params.skip_unycicler ) {
+    if ( !params.skip_unicycler ) {
         UNICYCLER (
             ch_unicycler
         )
         ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
     
-    // ANALISIS DE CALIDAD ENSAMBLADO
+    // ANÁLISIS DE CALIDAD ENSAMBLADO
     // MODULE: Run Quast
     //
     ch_assembly_read
@@ -100,7 +100,7 @@ workflow RESVIRPREDICTOR {
     )
     ch_quast_multiqc = QUAST.out.tsv
     }
-    // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
+    // BÚSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
     //
     if ( !params.skip_ariba ) {
@@ -127,7 +127,7 @@ workflow RESVIRPREDICTOR {
     // BUSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN ENSAMBLADOS
     // MODULE: Run Multiples databases Abricate
     //
-    if ( !params.skip_assemblyanalisis && !params.skip_unycicler ) {
+    if ( !params.skip_assemblyanalisis && !params.skip_unicycler ) {
     if (params.abricate_db) {
         ABRICATE_STAPH (
             ch_assembly_read,
@@ -162,7 +162,7 @@ workflow RESVIRPREDICTOR {
     // ANOTACION
     // MODULE: Prokka
     //
-    if (!params.skip_unycicler ) {
+    if (!params.skip_unicycler ) {
     PROKKA (
         ch_assembly_read,
         [],
@@ -172,7 +172,7 @@ workflow RESVIRPREDICTOR {
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
-    if (params.filogeny) {
+    if (params.phylogeny) {
         MASH_SCREEN (
             ch_assembly_read,
             params.mash_reference
@@ -203,7 +203,7 @@ workflow RESVIRPREDICTOR {
                 .map { file -> file.text.trim() }
                 .set { ch_final_genome }
 
-        // DESCARGA DE BASE DE DATOS DE REFERENCIA
+        // DESCARGA DE LA BASE DE DATOS DE REFERENCIA
         // MODULE: Run ncbi-genome-download
         //
         NCBIGENOMEDOWNLOAD (
@@ -218,7 +218,7 @@ workflow RESVIRPREDICTOR {
                 .set { ch_to_snippy }
 
     /*
-        // BUSQUEDA DE DISTANCIAS SEGUN GENOMA DE REFERENCIA
+        // ESTUDIO DE DISTANCIAS SEGÚN EL GENOMA DE REFERENCIA
         // MODULE: Run Mash Dist
         //
         MASH_DIST (
@@ -259,7 +259,7 @@ workflow RESVIRPREDICTOR {
             []
         )
 
-        // ESTUDIO DE DISTANCIA ENTRE ENSAMBLADOS
+        // ESTUDIO DE DISTANCIAS ENTRE ENSAMBLADOS
         // MODULE: IQTree
         //
         ch_assembly_read
@@ -283,7 +283,7 @@ workflow RESVIRPREDICTOR {
     // ESTUDIO MLST PARA STAPHYLOCOCCUS AUREUS
     // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spa-type, SCCmec, agr Locus y Consolidar Tipados.
     //
-    if ( !params.skip_mlst && !params.skip_unycicler ) {
+    if ( !params.skip_mlst && !params.skip_unicycler ) {
         STAPTYPES (
             ch_assembly_read
         )
@@ -329,7 +329,7 @@ workflow RESVIRPREDICTOR {
         ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files                      = ch_multiqc_files.mix(ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files                      = ch_multiqc_files.mix(ch_trim_json_multiqc.collect{it[1]}.ifEmpty([]))
-        if ( !params.skip_unycicler ) {
+        if ( !params.skip_unicycler ) {
             ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
         }
     

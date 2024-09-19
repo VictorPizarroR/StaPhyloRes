@@ -57,46 +57,46 @@
         "skipping_options": {
             "title": "Skipping Options",
             "type": "object",
-            "description": "Define skip modules from pipeline",
+            "description": "Define skip modules from pipeline.",
             "default": "",
             "properties": {
-                "skip_unycicler": {
+                "skip_unicycler": {
                     "type": "boolean",
-                    "description": "Skip Unyciler",
+                    "description": "Skip Unicyler.",
                     "fa_icon": "fas fa-fast-forward"
                 },
                 "skip_ariba": {
                     "type": "boolean",
-                    "description": "Skip Ariba analisis",
+                    "description": "Skip Ariba analisis.",
                     "fa_icon": "fas fa-fast-forward"
                 },
                 "skip_assemblyanalisis": {
                     "type": "boolean",
-                    "description": "Skip Abricate & Stararm analisis",
+                    "description": "Skip Abricate & Stararm analisis.",
                     "fa_icon": "fas fa-fast-forward"
                 },
                 "skip_mykrobe": {
                     "type": "boolean",
-                    "description": "Skip Mykrobe",
+                    "description": "Skip Mykrobe.",
                     "fa_icon": "fas fa-fast-forward"
                 },
                 "skip_mlst": {
                     "type": "boolean",
-                    "description": "Skip MLST Study",
+                    "description": "Skip MLST Study.",
                     "fa_icon": "fas fa-fast-forward"
                 }
             },
             "fa_icon": "fas fa-forward"
         },
-        "filogeny_study": {
-            "title": "Filogeny Study",
+        "phylogeny_study": {
+            "title": "Phylogeny Study",
             "type": "object",
             "fa_icon": "fas fa-dna",
             "description": "Reference genome related files and options required for the workflow.",
             "properties": {
-                "filogeny": {
+                "phylogeny": {
                     "type": "boolean",
-                    "help_text": "If value is true, you must point the full route to your mash reference file, obtained from https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh",
+                    "description": "If value is true, you must point the full route to your mash reference file, obtained from https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh.",
                     "fa_icon": "fas fa-wrench"
                 },
                 "mash_reference": {
