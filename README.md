@@ -39,8 +39,8 @@ Este trabajo forma parte del Trabajo de Fin de Máster del Máster Universitario
 3. Ensamblaje de genomas ([`Unicycler`](https://github.com/rrwick/Unicycler))
 4. Anotación de genes ([`Prokka`](https://github.com/tseemann/prokka))
 5. Análisis de genes de resistencia y virulencia ([`ARIBA`](https://github.com/sanger-pathogens/ariba), [`ABRICATE`](https://github.com/tseemann/abricate)), ([`STARARM`](https://github.com/phac-nml/staramr))
-6. Estudio de filogenia ([Snippy](https://github.com/tseemann/snippy), [IQTree](http://www.iqtree.org/), [Gubbins](https://github.com/sanger-pathogens/gubbins))
-7. Predicción de resistencia fenotípica ([Mykrobe](https://github.com/Mykrobe-tools/mykrobe))
+6. Estudio de filogenia ([`Snippy`](https://github.com/tseemann/snippy), [`IQTree`](http://www.iqtree.org/), [`Gubbins`](https://github.com/sanger-pathogens/gubbins))
+7. Predicción de resistencia fenotípica ([`Mykrobe`](https://github.com/Mykrobe-tools/mykrobe))
 
 
 # Workflow
@@ -65,11 +65,7 @@ El pipeline se compone de los siguientes pasos:
 
 ## Preparación de los Datos
 
-Primero, prepara una samplesheet con las secuencias R1 y R2, que debe tener el siguiente formato:
-
-samplesheet.csv:
-
-`samplesheet.csv`:
+Primero, prepara una samplesheet con las secuencias R1 y R2, que debe tener el siguiente formato `samplesheet.csv`:
 
 ```csv
 sample,fastq_1,fastq_2
@@ -219,23 +215,12 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
     Muestra el texto de ayuda.
 
 
-To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/resvirpredictor/results) tab on the nf-core website pipeline page.
-For more details about the output files and reports, please refer to the
-[output documentation](https://nf-co.re/resvirpredictor/output).
+## Resultados
+Para ver los resultados de una ejecución de prueba con un conjunto de datos de tamaño completo, consulta la carpeta [results](https://nf-co.re/resvirpredictor/results) contenida en esta pagina.
 
-## Credits
+## Créditos
 
-nf-core/resvirpredictor was originally written by Victor Pizarro Riveros.
-
-We thank the following people for their extensive assistance in the development of this pipeline:
-
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
-
-## Contributions and Support
-
-If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
-
-For further information or help, don't hesitate to get in touch on the [Slack `#resvirpredictor` channel](https://nfcore.slack.com/channels/resvirpredictor) (you can join with [this invite](https://nf-co.re/join/slack)).
+nf-core/resvirpredictor fue originalmente escrito por Víctor Pizarro Riveros.
 
 ## Citations
 
@@ -244,9 +229,9 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
-An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+Una lista completa de referencias para las herramientas utilizadas por el pipeline se puede encontrar en el archivo  [`CITATIONS.md`](CITATIONS.md).
 
-You can cite the `nf-core` publication as follows:
+Puedes citar la publicación de `nf-core` de la siguiente manera:
 
 > **The nf-core framework for community-curated bioinformatics pipelines.**
 >
