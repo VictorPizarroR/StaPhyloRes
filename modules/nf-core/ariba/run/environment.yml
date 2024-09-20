@@ -5,3 +5,4 @@ channels:
   - defaults
 dependencies:
   - bioconda::ariba=2.14.6
+  - defaults::bcftools=1.12
