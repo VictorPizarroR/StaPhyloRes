@@ -215,8 +215,7 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
     Muestra el texto de ayuda.
 
 ## Cambiar el Directorio de Trabajo en la Línea de Comandos
-
-    Puedes especificar un directorio de trabajo personalizado al ejecutar el pipeline usando la opción `-work-dir`.
+  Puedes especificar un directorio de trabajo personalizado al ejecutar el pipeline usando la opción `-work-dir`.
 
 ```bash
 nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -work-dir /path/to/custom/workdir
