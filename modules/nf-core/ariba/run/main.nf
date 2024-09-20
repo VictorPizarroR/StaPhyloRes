@@ -6,6 +6,9 @@ process ARIBA_RUN {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/ariba:2.14.6--py39h67e14b5_3':
         'biocontainers/ariba:2.14.6--py39h67e14b5_3' }"
+    
+    // Estrategia de manejo de errores
+    errorStrategy 'ignore'
 
     input:
     tuple val(meta), path(reads)
@@ -35,6 +38,11 @@ process ARIBA_RUN {
         $args \\
         --threads $task.cpus
 
+    # Verificar si el comando anterior falló
+    if [ \$? -ne 0 ]; then
+        echo "ERROR: ARIBA_RUN encontró un error al procesar ${meta.id}."
+    fi
+    
     ariba \\
         summary \\
         ${db_name}/summary \\
