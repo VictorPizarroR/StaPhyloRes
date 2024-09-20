@@ -305,7 +305,7 @@
             "$ref": "#/definitions/skipping_options"
         },
         {
-            "$ref": "#/definitions/filogeny_study"
+            "$ref": "#/definitions/phylogeny_study"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
