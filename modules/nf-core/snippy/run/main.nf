@@ -5,7 +5,7 @@ process SNIPPY_RUN {
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/snippy:4.6.0--hdfd78af_2' :
-        'biocontainers/snippy:4.6.0--hdfd78af_2' }"
+        'staphb/snippy:4.6.0-SC2' }"
 
     input:
     tuple val(meta), path(reads)

@@ -117,8 +117,16 @@ Este comando ejecutará el análisis base, que incluye:
 nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile conda
 ```
 
+  DOCKER
+
+  Ejemplo de ejecución con docker:
+
+```bash
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile docker
+```
+
 #  Análisis Opcionales y Complementarios
-## Uso de una Base de Datos Personalizada
+## Uso de una Base de Datos Personalizada (Sólo en ejecución básica)
 El pipeline está configurado para utilizar una base de datos personalizada, "staph_vf.fasta", contenida en el directorio `resourses`. Para usarla, sigue estos pasos:
 
 ## Pasos Previos
@@ -142,7 +150,7 @@ abricate --setupdb
 nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
 ```
 
-## Estudio de filogenia
+## Estudio de filogenia (Sólo ejecución básica y profiles CONDA/DOCKER)
   El pipeline puede obtener una base de datos de referencia óptima comparando las secuencias entregadas con la base de datos facilitada por MASH.
 
 ## Paso Previo
@@ -153,7 +161,7 @@ https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
 
 2. Ejecuta el pipeline con la referencia de MASH:
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --filogeny true --mash_reference pathtomashreference.msh
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --phylogeny true --mash_reference pathtomashreference.msh
 ```
 # Comandos
 ## Input/Output Options
