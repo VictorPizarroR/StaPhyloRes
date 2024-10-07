@@ -5,7 +5,7 @@ process ARIBA_GETREF {
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/ariba:2.14.6--py39h67e14b5_3':
-        'biocontainers/ariba:2.14.6--py39h67e14b5_3' }"
+        'sangerpathogens/ariba:release-v2.14.6' }"
 
     input:
     val(db_name)
