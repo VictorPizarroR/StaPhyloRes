@@ -64,7 +64,7 @@ workflow RESVIRPREDICTOR {
         params.save_trimmed_fail,
         params.save_merged,
         params.skip_fastp,
-        params.skip_fastqc
+        params.skip_fastqcf
         )
         ch_fastqc_raw_multiqc   = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_raw_zip
         ch_fastqc_trim_multiqc  = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_trim_zip
@@ -99,6 +99,34 @@ workflow RESVIRPREDICTOR {
         [[:],[]]
     )
     ch_quast_multiqc = QUAST.out.tsv
+    }
+    // ANOTACION
+    // MODULE: Prokka
+    //
+    if (!params.skip_unicycler ) {
+    PROKKA (
+        ch_assembly_read,
+        [],
+        []
+    )
+    }
+    // PREDICCION DE RESISTENCIA
+    // MODULE: Run Mykrobe
+    //
+    if ( !params.skip_mykrobe ) {
+        MYKROBE_PREDICT (
+            ch_trim_fastp,
+            'staph'
+        )
+
+        MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
+    
+        SUMMARY_MYKROBE (
+            ch_merge_mykrobe,
+            'csv',
+            'csv',
+            ''
+        )
     }
     // BÚSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
@@ -159,16 +187,7 @@ workflow RESVIRPREDICTOR {
             ''
         )
     }
-    // ANOTACION
-    // MODULE: Prokka
-    //
-    if (!params.skip_unicycler ) {
-    PROKKA (
-        ch_assembly_read,
-        [],
-        []
-    )
-    }
+
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
@@ -286,24 +305,6 @@ workflow RESVIRPREDICTOR {
     if ( !params.skip_mlst && !params.skip_unicycler ) {
         STAPTYPES (
             ch_assembly_read
-        )
-    }
-    // PREDICCION DE RESISTENCIA
-    // MODULE: Run Mykrobe
-    //
-    if ( !params.skip_mykrobe ) {
-        MYKROBE_PREDICT (
-            ch_trim_fastp,
-            'staph'
-        )
-
-        MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
-    
-        SUMMARY_MYKROBE (
-            ch_merge_mykrobe,
-            'csv',
-            'csv',
-            ''
         )
     }
     //

@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/resvirpredictor/master/nextflow_schema.json",
     "title": "nf-core/resvirpredictor pipeline parameters",
-    "description": "Esta pipeline se realiza analisis de calidad, trimado, ensamblado para luego realizar la busqueda de genes de resistencia, virulencia, fagos y su expresion fenotipica.",
+    "description": "Esta Pipeline realiza el Análisis de Resistencia, Virulencia, Tipificación Molecular y Filogenia en Cepas de Staphylococcus aureus.",
     "type": "object",
     "definitions": {
         "input_output_options": {
