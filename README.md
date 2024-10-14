@@ -1,7 +1,7 @@
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo.gif">
-    <img alt="staphylores" src="docs/images/logo.gif">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-black.gif">
+    <img alt="staphylores" src="docs/images/logo-black.gif">
   </picture>
 </h1>
 
