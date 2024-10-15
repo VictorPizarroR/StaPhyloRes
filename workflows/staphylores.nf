@@ -34,14 +34,14 @@ include { GENOME_COMPLETE_MATCH                     } from '../subworkflows/loca
 include { GENOME_FILTER_MATCH                       } from '../subworkflows/local/search2'
 include { paramsSummaryMultiqc                      } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML                    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText                    } from '../subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { methodsDescriptionText                    } from '../subworkflows/local/utils_nfcore_staphylores_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow RESVIRPREDICTOR {
+workflow STAPHYLORES {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
@@ -57,14 +57,14 @@ workflow RESVIRPREDICTOR {
     ch_fastqc_raw_multiqc = Channel.empty()
     ch_fastqc_trim_multiqc = Channel.empty()
     ch_trim_json_multiqc = Channel.empty()
-    
+
     FASTQ_TRIM_FASTP_FASTQC (
         ch_samplesheet,
         [],
         params.save_trimmed_fail,
         params.save_merged,
         params.skip_fastp,
-        params.skip_fastqc
+        params.skip_fastqcf
         )
         ch_fastqc_raw_multiqc   = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_raw_zip
         ch_fastqc_trim_multiqc  = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_trim_zip
@@ -76,7 +76,7 @@ workflow RESVIRPREDICTOR {
             .dump(tag: 'ch_unicycler')
             .set { ch_unicycler }
         ch_versions             = ch_versions.mix(FASTQ_TRIM_FASTP_FASTQC.out.versions)
-    
+
     // ENSAMBLADO
     // MODULE: Run Unicycler
     //
@@ -85,7 +85,7 @@ workflow RESVIRPREDICTOR {
             ch_unicycler
         )
         ch_assembly_read    = UNICYCLER.out.scaffolds.dump(tag: 'Unicycler')
-    
+
     // ANÁLISIS DE CALIDAD ENSAMBLADO
     // MODULE: Run Quast
     //
@@ -99,6 +99,34 @@ workflow RESVIRPREDICTOR {
         [[:],[]]
     )
     ch_quast_multiqc = QUAST.out.tsv
+    }
+    // ANOTACION
+    // MODULE: Prokka
+    //
+    if (!params.skip_unicycler ) {
+    PROKKA (
+        ch_assembly_read,
+        [],
+        []
+    )
+    }
+    // PREDICCION DE RESISTENCIA
+    // MODULE: Run Mykrobe
+    //
+    if ( !params.skip_mykrobe ) {
+        MYKROBE_PREDICT (
+            ch_trim_fastp,
+            'staph'
+        )
+
+        MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
+
+        SUMMARY_MYKROBE (
+            ch_merge_mykrobe,
+            'csv',
+            'csv',
+            ''
+        )
     }
     // BÚSQUEDA DE GENES DE RESISTENCIA/VIRULENCIA EN SECUENCIAS R1 & R2
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
@@ -159,16 +187,7 @@ workflow RESVIRPREDICTOR {
             ''
         )
     }
-    // ANOTACION
-    // MODULE: Prokka
-    //
-    if (!params.skip_unicycler ) {
-    PROKKA (
-        ch_assembly_read,
-        [],
-        []
-    )
-    }
+
     // BUSQUEDA DE GENOMA DE REFERENCIA
     // MODULE: Run Mash Screen
     //
@@ -177,7 +196,7 @@ workflow RESVIRPREDICTOR {
             ch_assembly_read,
             params.mash_reference
             )
-    
+
 
         ch_mash        = MASH_SCREEN.out.screen
             ch_mash
@@ -266,7 +285,7 @@ workflow RESVIRPREDICTOR {
             .collect{ it[1] }
             .map { consensus_collect -> tuple([id: "aligments"], consensus_collect) }
             .set { ch_to_mashtree }
-    
+
         MASHTREE (
             ch_to_mashtree
         )
@@ -286,24 +305,6 @@ workflow RESVIRPREDICTOR {
     if ( !params.skip_mlst && !params.skip_unicycler ) {
         STAPTYPES (
             ch_assembly_read
-        )
-    }
-    // PREDICCION DE RESISTENCIA
-    // MODULE: Run Mykrobe
-    //
-    if ( !params.skip_mykrobe ) {
-        MYKROBE_PREDICT (
-            ch_trim_fastp,
-            'staph'
-        )
-
-        MYKROBE_PREDICT.out.csv.collect{meta, csv -> csv}.map{ csv -> [[id:'mykrobe-report'], csv]}.set{ ch_merge_mykrobe }
-    
-        SUMMARY_MYKROBE (
-            ch_merge_mykrobe,
-            'csv',
-            'csv',
-            ''
         )
     }
     //
@@ -332,18 +333,18 @@ workflow RESVIRPREDICTOR {
         if ( !params.skip_unicycler ) {
             ch_multiqc_files                      = ch_multiqc_files.mix(ch_quast_multiqc.collect{it[1]}.ifEmpty([]))
         }
-    
+
         MULTIQC (
             ch_multiqc_files.collect(),
             ch_multiqc_config.toList(),
             ch_multiqc_custom_config.toList(),
             ch_multiqc_logo.toList()
         )
-    
+
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
-    
+
 }
 
 /*

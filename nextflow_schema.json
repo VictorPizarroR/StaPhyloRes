@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/resvirpredictor/master/nextflow_schema.json",
-    "title": "nf-core/resvirpredictor pipeline parameters",
-    "description": "Esta pipeline se realiza analisis de calidad, trimado, ensamblado para luego realizar la busqueda de genes de resistencia, virulencia, fagos y su expresion fenotipica.",
+    "title": "StaPhyloRes pipeline parameters",
+    "description": "Pipeline para la detección de genes de resistencia a antibióticos, virulencia, tipificación molecular, análisis filogenético y predicción fenotípica de sensibilidad antibiótica en cepas de Staphylococcus aureus.",
     "type": "object",
     "definitions": {
         "input_output_options": {

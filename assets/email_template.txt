@@ -4,15 +4,15 @@
   |\\ | |__  __ /  ` /  \\ |__) |__         }  {
   | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
                                         `._,._,'
-  nf-core/resvirpredictor ${version}
+  StaPhyloRes ${version}
 ----------------------------------------------------
 Run Name: $runName
 
 <% if (success){
-    out << "## nf-core/resvirpredictor execution completed successfully! ##"
+    out << "## StaPhyloRes execution completed successfully! ##"
 } else {
     out << """####################################################
-## nf-core/resvirpredictor execution completed unsuccessfully! ##
+## StaPhyloRes execution completed unsuccessfully! ##
 ####################################################
 The exit status of the task that caused the workflow execution to fail was: $exitStatus.
 The full error message was:
@@ -35,5 +35,5 @@ Pipeline Configuration:
 <% out << summary.collect{ k,v -> " - $k: $v" }.join("\n") %>
 
 --
-nf-core/resvirpredictor
-https://github.com/nf-core/resvirpredictor
+StaPhyloRes
+https://github.com/VictorPizarroR/StaPhyloRes

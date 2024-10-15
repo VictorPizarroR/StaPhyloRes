@@ -1,6 +1,6 @@
 {
-    "name": "nf-core/resvirpredictor",
-    "homePage": "https://github.com/nf-core/resvirpredictor",
+    "name": "StaPhyloRes",
+    "homePage": "https://github.com/VictorPizarroR/StaPhyloRes",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {

@@ -1,13 +1,9 @@
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/nf-core-resvirpredictor_logo_dark.png">
-    <img alt="nf-core/resvirpredictor" src="docs/images/nf-core-resvirpredictor_logo_light.png">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-black.gif">
+    <img alt="staphylores" src="docs/images/logo-black.gif">
   </picture>
 </h1>
-
-[![GitHub Actions CI Status](https://github.com/nf-core/resvirpredictor/actions/workflows/ci.yml/badge.svg)](https://github.com/nf-core/resvirpredictor/actions/workflows/ci.yml)
-[![GitHub Actions Linting Status](https://github.com/nf-core/resvirpredictor/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/resvirpredictor/actions/workflows/linting.yml)[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/resvirpredictor/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
-[![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.0-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -15,17 +11,19 @@
 <!--[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/) -->
 <!--[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://tower.nf/launch?pipeline=https://github.com/nf-core/resvirpredictor) -->
 
-[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23resvirpredictor-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/resvirpredictor)[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
-
 # Introduccion
 
-nf-core/resvirpredictor es un pipeline de bioinformática desarrollado para la caracterización molecular de cepas de Staphylococcus aureus en pacientes con enfermedad invasora. Este pipeline permite realizar análisis de calidad de secuencias, ensamblaje, búsqueda de genes de resistencia y virulencia, estudio de tipificación molecular, análisis filogenético y predicción fenotípica de resistencia a antibióticos.
+StaPhyloRes es un pipeline de bioinformática desarrollado para la caracterización molecular de cepas de Staphylococcus aureus en pacientes con enfermedad invasora. Este pipeline permite realizar análisis de calidad de secuencias, ensamblaje, detección de genes de resistencia a antibióticos, virulencia, tipificación molecular, análisis filogenético y predicción fenotípica de sensibilidad antibiótica en cepas de Staphylococcus aureus.
+
+![staphylores_pipeline_graph](docs/images/workflow.gif)
+
+The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner.
 
 Este trabajo forma parte del Trabajo de Fin de Máster del Máster Universitario en Bioinformática de la Universidad Europea de Madrid.
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
+   major pipeline sections and the types of outpu t it produces. You're giving an overview to someone new
    to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
 -->
 
@@ -97,7 +95,7 @@ conda activate env_name
 # Ejecución Básica:
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ 
+nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/
 ```
 Este comando ejecutará el análisis base, que incluye:
 - Análisis de calidad de secuencias raw
@@ -155,7 +153,7 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
   El pipeline puede obtener una base de datos de referencia óptima comparando las secuencias entregadas con la base de datos facilitada por MASH.
 
 ## Paso Previo
-  1. Descarga la base de datos de referencia desde el sitio oficial: 
+  1. Descarga la base de datos de referencia desde el sitio oficial:
 ```bash
 https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
 ```
@@ -232,25 +230,27 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
 
 
 ## Resultados
-Para ver los resultados de una ejecución de prueba con un conjunto de datos de tamaño completo, consulta la carpeta [results](https://nf-co.re/resvirpredictor/results) contenida en esta pagina.
+Para ver los resultados de una ejecución de prueba con un conjunto de datos de tamaño completo, consulta la carpeta [results](https://github.com/VictorPizarroR/StaPhyloRes/tree/master/results) contenida en esta pagina.
 
 ## Créditos
 
-nf-core/resvirpredictor fue originalmente escrito por Víctor Pizarro Riveros.
+StaPhyloRes fue originalmente escrito por Víctor Pizarro Riveros.
 
 ## Citations
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use nf-core/resvirpredictor for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+<!-- If you use StaPhyloRes for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
 Una lista completa de referencias para las herramientas utilizadas por el pipeline se puede encontrar en el archivo  [`CITATIONS.md`](CITATIONS.md).
 
-Puedes citar la publicación de `nf-core` de la siguiente manera:
+This pipeline uses code and infrastructure developed and maintained by the [nf-core](https://nf-co.re) initative, and reused here under the [MIT license](https://github.com/nf-core/tools/blob/master/LICENSE).
 
-> **The nf-core framework for community-curated bioinformatics pipelines.**
+> The nf-core framework for community-curated bioinformatics pipelines.
 >
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
-> _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
+> Nat Biotechnol. 2020 Feb 13. doi: 10.1038/s41587-020-0439-x.
+
+In addition, references of tools and data used in this pipeline are as follows:

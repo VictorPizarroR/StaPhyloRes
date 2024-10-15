@@ -4,21 +4,21 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta name="description" content="nf-core/resvirpredictor: Esta pipeline se realiza analisis de calidad, trimado, ensamblado para luego realizar la busqueda de genes de resistencia, virulencia, fagos y su expresion fenotipica.">
-  <title>nf-core/resvirpredictor Pipeline Report</title>
+  <meta name="description" content="StaPhyloRes: Pipeline para la detección de genes de resistencia a antibióticos, virulencia, tipificación molecular, análisis filogenético y predicción fenotípica de sensibilidad antibiótica en cepas de Staphylococcus aureus.">
+  <title>StaPhyloRes Pipeline Report</title>
 </head>
 <body>
 <div style="font-family: Helvetica, Arial, sans-serif; padding: 30px; max-width: 800px; margin: 0 auto;">
 
 <img src="cid:nfcorepipelinelogo">
 
-<h1>nf-core/resvirpredictor ${version}</h1>
+<h1>StaPhyloRes ${version}</h1>
 <h2>Run Name: $runName</h2>
 
 <% if (!success){
     out << """
     <div style="color: #a94442; background-color: #f2dede; border-color: #ebccd1; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px;">
-        <h4 style="margin-top:0; color: inherit;">nf-core/resvirpredictor execution completed unsuccessfully!</h4>
+        <h4 style="margin-top:0; color: inherit;">StaPhyloRes execution completed unsuccessfully!</h4>
         <p>The exit status of the task that caused the workflow execution to fail was: <code>$exitStatus</code>.</p>
         <p>The full error message was:</p>
         <pre style="white-space: pre-wrap; overflow: visible; margin-bottom: 0;">${errorReport}</pre>
@@ -27,7 +27,7 @@
 } else {
     out << """
     <div style="color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px;">
-        nf-core/resvirpredictor execution completed successfully!
+        StaPhyloRes execution completed successfully!
     </div>
     """
 }
@@ -44,8 +44,8 @@
     </tbody>
 </table>
 
-<p>nf-core/resvirpredictor</p>
-<p><a href="https://github.com/nf-core/resvirpredictor">https://github.com/nf-core/resvirpredictor</a></p>
+<p>StaPhyloRes</p>
+<p><a href="https://github.com/VictorPizarroR/StaPhyloRes">https://github.com/VictorPizarroR/StaPhyloRes</a></p>
 
 </div>
 

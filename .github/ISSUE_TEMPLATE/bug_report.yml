@@ -8,7 +8,7 @@ body:
         Before you post this issue, please check the documentation:
 
         - [nf-core website: troubleshooting](https://nf-co.re/usage/troubleshooting)
-        - [nf-core/resvirpredictor pipeline documentation](https://nf-co.re/resvirpredictor/usage)
+        - [nf-core/resvirpredictor pipeline documentation]()
 
   - type: textarea
     id: description
