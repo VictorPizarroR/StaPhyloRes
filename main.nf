@@ -1,11 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/resvirpredictor
+    StaPhyloRes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/resvirpredictor
-    Website: https://nf-co.re/resvirpredictor
-    Slack  : https://nfcore.slack.com/channels/resvirpredictor
+    Github : https://github.com/VictorPizarroR/StaPhyloRes
 ----------------------------------------------------------------------------------------
 */
 
@@ -17,11 +15,11 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RESVIRPREDICTOR  } from './workflows/resvirpredictor'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { STAPHYLORES  } from './workflows/staphylores'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_staphylores_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_staphylores_pipeline'
 
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_resvirpredictor_pipeline'
+include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_staphylores_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,7 +41,7 @@ params.fasta = getGenomeAttribute('fasta')
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow NFCORE_RESVIRPREDICTOR {
+workflow NFCORE_STAPHYLORES {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -53,12 +51,12 @@ workflow NFCORE_RESVIRPREDICTOR {
     //
     // WORKFLOW: Run pipeline
     //
-    RESVIRPREDICTOR (
+    STAPHYLORES (
         samplesheet
     )
 
     emit:
-    multiqc_report = RESVIRPREDICTOR.out.multiqc_report // channel: /path/to/multiqc_report.html
+    multiqc_report = STAPHYLORES.out.multiqc_report // channel: /path/to/multiqc_report.html
 
 }
 /*
@@ -87,7 +85,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NFCORE_RESVIRPREDICTOR (
+    NFCORE_STAPHYLORES (
         PIPELINE_INITIALISATION.out.samplesheet
     )
 
@@ -101,7 +99,7 @@ workflow {
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        NFCORE_RESVIRPREDICTOR.out.multiqc_report
+        NFCORE_STAPHYLORES.out.multiqc_report
     )
 }
 

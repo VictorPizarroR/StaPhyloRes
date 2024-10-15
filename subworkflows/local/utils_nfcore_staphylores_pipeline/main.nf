@@ -1,5 +1,5 @@
 //
-// Subworkflow with functionality specific to the nf-core/resvirpredictor pipeline
+// Subworkflow with functionality specific to the StaPhyloRes pipeline
 //
 
 /*

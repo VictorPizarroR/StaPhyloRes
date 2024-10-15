@@ -1,1 +1,21 @@
 repository_type: pipeline
+# nf-core lint configuration file
+# Disable specific lint tests for pipelines outside nf-core standards
+
+disabled_tests:
+  - nf-core_schema          # Disable schema validation for nf-core
+  - pipeline_name           # Disable pipeline name checks (nf-core/<pipeline_name>)
+  - nextflow_config         # Disable Nextflow config checks (e.g. manifest and params)
+  - docs_readme             # Disable README structure checks
+  - docs_usage              # Disable usage documentation checks
+  - files_licence           # Disable license file checks
+  - dockerfile              # Disable Dockerfile checks
+  - singularity_container   # Disable Singularity image checks
+  - git_remote              # Disable Git remote settings checks
+  - ci_tests                # Disable CI (Continuous Integration) tests validation
+  - singularity_container   # Disable Singularity container checks
+  - pytest_imports          # Disable checks for pytest imports in tests
+  - module_in_readme        # Disable checks that verify modules documentation in README
+  - software_versions       # Disable checks for the presence of software versions in the logs
+
+# Add any additional custom configuration here as needed

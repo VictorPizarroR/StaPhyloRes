@@ -13,7 +13,7 @@
 
 # Introduccion
 
-nf-core/resvirpredictor es un pipeline de bioinformática desarrollado para la caracterización molecular de cepas de Staphylococcus aureus en pacientes con enfermedad invasora. Este pipeline permite realizar análisis de calidad de secuencias, ensamblaje, búsqueda de genes de resistencia y virulencia, estudio de tipificación molecular, análisis filogenético y predicción fenotípica de resistencia a antibióticos.
+StaPhyloRes es un pipeline de bioinformática desarrollado para la caracterización molecular de cepas de Staphylococcus aureus en pacientes con enfermedad invasora. Este pipeline permite realizar análisis de calidad de secuencias, ensamblaje, detección de genes de resistencia a antibióticos, virulencia, tipificación molecular, análisis filogenético y predicción fenotípica de sensibilidad antibiótica en cepas de Staphylococcus aureus.
 
 ![staphylores_pipeline_graph](docs/images/workflow.gif)
 
@@ -23,7 +23,7 @@ Este trabajo forma parte del Trabajo de Fin de Máster del Máster Universitario
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
+   major pipeline sections and the types of outpu t it produces. You're giving an overview to someone new
    to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
 -->
 
@@ -228,16 +228,16 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
 ```
 
 ## Resultados
-Para ver los resultados de una ejecución de prueba con un conjunto de datos de tamaño completo, consulta la carpeta [results](https://nf-co.re/resvirpredictor/results) contenida en esta pagina.
+Para ver los resultados de una ejecución de prueba con un conjunto de datos de tamaño completo, consulta la carpeta [results](https://github.com/VictorPizarroR/StaPhyloRes/tree/master/results) contenida en esta pagina.
 
 ## Créditos
 
-nf-core/resvirpredictor fue originalmente escrito por Víctor Pizarro Riveros.
+StaPhyloRes fue originalmente escrito por Víctor Pizarro Riveros.
 
 ## Citations
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use nf-core/resvirpredictor for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+<!-- If you use StaPhyloRes for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 

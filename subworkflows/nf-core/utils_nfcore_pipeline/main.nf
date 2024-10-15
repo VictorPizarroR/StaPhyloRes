@@ -152,19 +152,23 @@ def paramsSummaryMultiqc(summary_params) {
 }
 
 //
-// nf-core logo
+// StaPhyloRes logo
 //
 def nfCoreLogo(monochrome_logs=true) {
     Map colors = logColours(monochrome_logs)
     String.format(
         """\n
         ${dashedLine(monochrome_logs)}
-                                                ${colors.green},--.${colors.black}/${colors.green},-.${colors.reset}
-        ${colors.blue}        ___     __   __   __   ___     ${colors.green}/,-._.--~\'${colors.reset}
-        ${colors.blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${colors.yellow}}  {${colors.reset}
-        ${colors.blue}  | \\| |       \\__, \\__/ |  \\ |___     ${colors.green}\\`-._,-`-,${colors.reset}
-                                                ${colors.green}`._,._,\'${colors.reset}
-        ${colors.purple}  ${workflow.manifest.name} ${getWorkflowVersion()}${colors.reset}
+        ${colors.blue}
+           ______                ______   _             _          ______
+          / _____)   _          (_____ \\ | |           | |        (_____ \\
+         ( (____   _| |_  _____  _____) )| |__   _   _ | |   ___   _____) ) _____   ___
+          \\____ \\ (_   _)(____ ||  ____/ |  _ \\ | | | || |  / _ \\ |  __  / | ___ | /___)
+          _____) )  | |_ / ___ || |      | | | || |_| || | | |_| || |  \\ \\ | ____||___ |
+         (______/    \\__)\\_____||_|      |_| |_| \\__  | \\_) \\___/ |_|   |_||_____)(___/
+                                                (____/
+        ${colors.reset}
+        ${colors.purple} StaPhyloRes ${getWorkflowVersion()}${colors.reset}
         ${dashedLine(monochrome_logs)}
         """.stripIndent()
     )
