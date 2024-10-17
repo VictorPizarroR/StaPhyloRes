@@ -5,7 +5,7 @@
 ![GitHub release](https://img.shields.io/github/release/VictorPizarroR/StaPhyloRes.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-# Introduccion
+# Introducción
 
 > **❗[Read in English](README_en.md)**.
 
@@ -202,7 +202,7 @@ Para ver los resultados de una ejecución de prueba con un conjunto de datos de 
 
 Agradecimientos especiales a la comunidad [nf-core](https://nf-co.re) por proporcionar herramientas bajo la [licencia MIT](https://opensource.org/licenses/MIT).
 
-## **Citations**
+## **Citación**
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
 <!-- If you use StaPhyloRes for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
