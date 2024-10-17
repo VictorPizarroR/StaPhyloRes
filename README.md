@@ -7,6 +7,8 @@
 
 # Introduccion
 
+> **❗[Read in English](README_en.md)**.
+
 **StaPhyloRes** es un pipeline bioinformatico el cual permite realizar análisis de calidad de secuencias, ensamblaje, detección de genes de resistencia a antibióticos, virulencia, tipificación molecular, análisis filogenético y predicción fenotípica de sensibilidad antibiótica en cepas de *Staphylococcus aureus*.
 
 El pipeline está construido usando [Nextflow](https://www.nextflow.io), una herramienta para ejecutar tareas en múltiples infraestructuras computacionales de manera muy portátil.
