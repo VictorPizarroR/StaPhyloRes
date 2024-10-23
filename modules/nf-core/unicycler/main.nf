@@ -1,11 +1,14 @@
 process UNICYCLER {
     tag "$meta.id"
-    label 'process_low'
+    label 'process_high'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/unicycler:0.4.8--py38h8162308_3' :
         'staphb/unicycler:0.5.0' }"
+
+    // Estrategia de manejo de errores
+    errorStrategy 'ignore'
 
     input:
     tuple val(meta), path(shortreads), path(longreads)
@@ -31,6 +34,11 @@ process UNICYCLER {
         $short_reads \\
         $long_reads \\
         --out ./
+
+    # Verificar si el comando anterior falló
+    if [ \$? -ne 0 ]; then
+        echo "ERROR: UNICYCLER encontró un error al procesar ${meta.id}."
+    fi
 
     mv assembly.fasta ${prefix}.scaffolds.fasta
     mv assembly.gfa ${prefix}.assembly.gfa

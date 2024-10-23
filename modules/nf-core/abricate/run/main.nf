@@ -7,6 +7,9 @@ process ABRICATE_RUN {
         'https://depot.galaxyproject.org/singularity/abricate%3A1.0.1--ha8f3691_1':
         'biocontainers/abricate:1.0.1--ha8f3691_1' }"
 
+    // Estrategia de manejo de errores
+    errorStrategy 'ignore'
+
     input:
     tuple val(meta), path(assembly)
     val database
@@ -28,6 +31,11 @@ process ABRICATE_RUN {
         $assembly \\
         $args \\
         --threads $task.cpus > ${prefix}_${database}.txt
+
+    # Verificar si el comando anterior falló
+    if [ \$? -ne 0 ]; then
+        echo "ERROR: ABRICATE encontró un error al procesar ${meta.id}."
+    fi
 
     abricate \\
         --summary \\
