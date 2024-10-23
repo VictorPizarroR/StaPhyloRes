@@ -55,10 +55,10 @@ sample,fastq_1,fastq_2
 IDENTIFICADOR,XXXXXXX_XX_L002_R1_001.fastq.gz,XXXXXXX_XX_L002_R2_001.fastq.gz
 ```
 
-Puedes utilizar el script incluido en la carpeta: `resourses` para crear esta samplesheet:
+Puedes utilizar el script [Crear SCV](https://github.com/VictorPizarroR/StaPhyloRes/blob/master/resourses/Crear_CSV.bash) incluido en la carpeta: `resourses` para crear esta samplesheet:
 
 ```bash
-./Crear_CSV.bash inputdir/ samplesheet.csv
+./Crear_CSV.bash inputdir/
 ```
 
 Cada fila representa un par de archivos fastq (paired end).
