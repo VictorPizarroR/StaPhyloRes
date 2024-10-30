@@ -21,15 +21,15 @@ include { CSVTK_CONCAT as SUMMARY_MYKROBE           } from '../modules/nf-core/c
 include { MASH_SCREEN                               } from '../modules/nf-core/mash/screen/main'
 include { GUBBINS                                   } from '../modules/nf-core/gubbins/main'
 include { NCBIGENOMEDOWNLOAD                        } from '../modules/nf-core/ncbigenomedownload/main'
-include { FASTQ_TRIM_FASTP_FASTQC                   } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
-include { STAPTYPES                                 } from '../subworkflows/local/staptypes'
-include { ARIBA as ARIBA_RESFINDER                  } from '../subworkflows/local/ariba'
-include { ARIBA as ARIBA_VFDB                       } from '../subworkflows/local/ariba'
-include { ARIBA as ARIBA_PLASMIDFINDER              } from '../subworkflows/local/ariba'
-include { ARIBA as ARIBA_CARD                       } from '../subworkflows/local/ariba'
-include { ABRICATE as ABRICATE_VFDB                 } from '../subworkflows/local/abricate'
-include { ABRICATE as ABRICATE_STAPH                } from '../subworkflows/local/abricate'
-include { ABRICATE as ABRICATE_RESFINDER            } from '../subworkflows/local/abricate'
+include { FASTQ_TRIM_FASTP_FASTQC as PRE_PROCESS    } from '../subworkflows/nf-core/fastq_trim_fastp_fastqc/main'
+include { STAPTYPES as M_TYPING                                 } from '../subworkflows/local/staptypes'
+include { ARIBA as AR_RESFINDER                  } from '../subworkflows/local/ariba'
+include { ARIBA as AR_VFDB                       } from '../subworkflows/local/ariba'
+include { ARIBA as AR_PLASMIDFINDER              } from '../subworkflows/local/ariba'
+include { ARIBA as AR_CARD                       } from '../subworkflows/local/ariba'
+include { ABRICATE as AB_VFDB                 } from '../subworkflows/local/abricate'
+include { ABRICATE as AB_STAPH                } from '../subworkflows/local/abricate'
+include { ABRICATE as AB_RESFINDER            } from '../subworkflows/local/abricate'
 include { GENOME_COMPLETE_MATCH                     } from '../subworkflows/local/search'
 include { GENOME_FILTER_MATCH                       } from '../subworkflows/local/search2'
 include { paramsSummaryMultiqc                      } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -58,7 +58,7 @@ workflow STAPHYLORES {
     ch_fastqc_trim_multiqc = Channel.empty()
     ch_trim_json_multiqc = Channel.empty()
 
-    FASTQ_TRIM_FASTP_FASTQC (
+    PRE_PROCESS (
         ch_samplesheet,
         [],
         [],
@@ -66,16 +66,16 @@ workflow STAPHYLORES {
         [],
         []
         )
-        ch_fastqc_raw_multiqc   = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_raw_zip
-        ch_fastqc_trim_multiqc  = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_trim_zip
-        ch_trim_json_multiqc    = FASTQ_TRIM_FASTP_FASTQC.out.trim_json
-        ch_trim_fastp           = FASTQ_TRIM_FASTP_FASTQC.out.reads
-            FASTQ_TRIM_FASTP_FASTQC.out.reads
+        ch_fastqc_raw_multiqc   = PRE_PROCESS.out.fastqc_raw_zip
+        ch_fastqc_trim_multiqc  = PRE_PROCESS.out.fastqc_trim_zip
+        ch_trim_json_multiqc    = PRE_PROCESS.out.trim_json
+        ch_trim_fastp           = PRE_PROCESS.out.reads
+            PRE_PROCESS.out.reads
             .dump(tag: 'fastp')
             .map{ meta,reads -> tuple(meta,reads,[]) }
             .dump(tag: 'ch_unicycler')
             .set { ch_unicycler }
-        ch_versions             = ch_versions.mix(FASTQ_TRIM_FASTP_FASTQC.out.versions)
+        ch_versions             = ch_versions.mix(PRE_PROCESS.out.versions)
 
     // ENSAMBLADO
     // MODULE: Run Unicycler
@@ -132,22 +132,22 @@ workflow STAPHYLORES {
     // SUBWORKFLOW: Obtener bases de datos Ariba, Run y Consolidar.
     //
     if ( !params.skip_ariba ) {
-        ARIBA_RESFINDER (
+        AR_RESFINDER (
             ch_trim_fastp,
             'resfinder'
         )
 
-        ARIBA_PLASMIDFINDER (
+        AR_PLASMIDFINDER (
             ch_trim_fastp,
             'plasmidfinder'
         )
 
-        ARIBA_CARD (
+        AR_CARD (
             ch_trim_fastp,
             'card'
         )
 
-        ARIBA_VFDB (
+        AR_VFDB (
             ch_trim_fastp,
             'vfdb_core'
         )
@@ -157,18 +157,18 @@ workflow STAPHYLORES {
     //
     if ( !params.skip_assemblyanalisis && !params.skip_unicycler ) {
     if (params.abricate_db) {
-        ABRICATE_STAPH (
+        AB_STAPH (
             ch_assembly_read,
             "staph"
             )
         }
 
-        ABRICATE_VFDB (
+        AB_VFDB (
             ch_assembly_read,
             "vfdb"
         )
 
-        ABRICATE_RESFINDER (
+        AB_RESFINDER (
             ch_assembly_read,
             "resfinder"
         )
@@ -303,7 +303,7 @@ workflow STAPHYLORES {
     // SUBWORKFLOW: Obtener Tipados moleculares comunes MLST, Spa-type, SCCmec, agr Locus y Consolidar Tipados.
     //
     if ( !params.skip_mlst && !params.skip_unicycler ) {
-        STAPTYPES (
+        M_TYPING (
             ch_assembly_read
         )
     }

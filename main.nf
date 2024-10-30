@@ -26,11 +26,17 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_stap
     NAMED WORKFLOWS FOR PIPELINE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+// Clean up any residual lock file from previous runs
+def lockFile = "${baseDir}/.nextflow/cache/${workflow.sessionId}/db/LOCK"
+if (file(lockFile).exists()) {
+    println "Cleaning up old lock file: ${lockFile}"
+    file(lockFile).delete()
+}
 
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow NFCORE_STAPHYLORES {
+workflow MAIN {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -74,7 +80,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NFCORE_STAPHYLORES (
+    MAIN (
         PIPELINE_INITIALISATION.out.samplesheet
     )
 
@@ -88,7 +94,7 @@ workflow {
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        NFCORE_STAPHYLORES.out.multiqc_report
+        MAIN.out.multiqc_report
     )
 }
 
