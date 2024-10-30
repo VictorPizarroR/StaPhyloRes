@@ -61,10 +61,10 @@ workflow STAPHYLORES {
     FASTQ_TRIM_FASTP_FASTQC (
         ch_samplesheet,
         [],
-        params.save_trimmed_fail,
-        params.save_merged,
-        params.skip_fastp,
-        params.skip_fastqcf
+        [],
+        [],
+        [],
+        []
         )
         ch_fastqc_raw_multiqc   = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_raw_zip
         ch_fastqc_trim_multiqc  = FASTQ_TRIM_FASTP_FASTQC.out.fastqc_trim_zip
