@@ -93,12 +93,12 @@ Este comando ejecutará el análisis, que incluye:
 
 #### **CONDA**
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile conda
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -profile conda
 ```
 
 #### **DOCKER**
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile docker
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -profile docker
 ```
 
 ---
@@ -118,7 +118,7 @@ abricate --datadir
 2. Copia el archivo `staph_vf.fasta`:
 
 ```bash
-cp TFM-Resvirpredictor/resources/staph_vf.fasta /pathtobd/staph/sequences
+cp StaPhyloRes/resources/staph_vf.fasta /pathtobd/staph/sequences
 
 abricate --setupdb
 ```
@@ -126,7 +126,7 @@ abricate --setupdb
 3. Ejecuta el pipeline:
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
 ```
 
 ---
@@ -141,7 +141,7 @@ https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
 Ejecuta el pipeline con la referencia de MASH:
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --phylogeny true --mash_reference pathtomashreference.msh
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ --phylogeny true --mash_reference pathtomashreference.msh
 ```
 
 ---
@@ -183,7 +183,7 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
   Puedes especificar un directorio de trabajo personalizado al ejecutar el pipeline usando la opción `-work-dir`.
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -work-dir /path/to/custom/workdir
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -work-dir /path/to/custom/workdir
 ```
 
 ## **Resultados**
