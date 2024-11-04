@@ -15,26 +15,19 @@ El pipeline está construido usando [Nextflow](https://www.nextflow.io), una her
 
 Este trabajo forma parte del Trabajo de Fin de Máster del Máster Universitario en Bioinformática de la Universidad Europea de Madrid.
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of outpu t it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
-
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
 ## Herramientas Usadas
 
 | Proceso                       | Herramienta                                                                                            |
 |-------------------------------|--------------------------------------------------------------------------------------------------------|
 | Control de calidad de lecturas | [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)                                |
+| Trimado de lecturas            | [`FastP`](https://github.com/OpenGene/fastp)                                                          |
 | Ensamblaje de genomas          | [`Unicycler`](https://github.com/rrwick/Unicycler)                                                    |
+| Control de calidad de ensamblados | [`Quast`](https://github.com/ablab/quast)                                                          |
 | Anotación de genes             | [`Prokka`](https://github.com/tseemann/prokka)                                                        |
 | Predicción de resistencia fenotípica          | [`Mykrobe`](https://github.com/Mykrobe-tools/mykrobe)                                  |
 | Análisis de resistencia        | [`ARIBA`](https://github.com/sanger-pathogens/ariba), [`ABRICATE`](https://github.com/tseemann/abricate), [`STARARM`](https://github.com/phac-nml/staramr) |
-| Filogenia                      | [`Snippy`](https://github.com/tseemann/snippy), [`IQTree`](http://www.iqtree.org/), [`Gubbins`](https://github.com/sanger-pathogens/gubbins) |
+| Filogenia                      | [`MASH`](https://mash.readthedocs.io/en/latest/), [`NCBI-genome-download`](https://github.com/kblin/ncbi-genome-download), [`Snippy`](https://github.com/tseemann/snippy), [`IQTree`](http://www.iqtree.org/), [`Gubbins`](https://github.com/sanger-pathogens/gubbins), [`MASH-Tree`](https://github.com/lskatz/mashtree) |
 | Tipado Molecular               | [`MLST`](https://github.com/tseemann/mlst), [`Spatyper`](https://github.com/HCGB-IGTP/spaTyper), [`Staphopia SCCmec`](https://github.com/staphopia/staphopia-sccmec), [`AgrVATE`](https://github.com/VishnuRaghuram94/AgrVATE).
 | Informes de calidad            | [`MultiQC`](http://multiqc.info/)
 
@@ -55,7 +48,7 @@ sample,fastq_1,fastq_2
 IDENTIFICADOR,XXXXXXX_XX_L002_R1_001.fastq.gz,XXXXXXX_XX_L002_R2_001.fastq.gz
 ```
 
-Puedes utilizar el script [Crear SCV](https://github.com/VictorPizarroR/StaPhyloRes/blob/master/resourses/Crear_CSV.bash) incluido en la carpeta: `resourses` para crear esta samplesheet:
+Puedes utilizar el script [Crear SCV](https://github.com/VictorPizarroR/StaPhyloRes/blob/master/resources/Crear_CSV.bash) incluido en la carpeta: `resources` para crear esta samplesheet:
 
 ```bash
 ./Crear_CSV.bash inputdir/
@@ -92,21 +85,21 @@ Este comando ejecutará el análisis, que incluye:
 - Trimado y análisis de calidad de secuencias trimadas
 - Ensamblaje
 - Análisis de calidad de ensamblados
+- Predicción de resistencia fenotípica basada en el análisis genómico
 - Búsqueda de genes de resistencia y virulencia en secuencias cortas y ensamblados
 - Estudio MLST para Staphylococcus aureus
-- Predicción de resistencia fenotípica basada en el análisis genómico
 - Generación de informes consolidados
 
 ### Profiles disponibles:
 
 #### **CONDA**
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile conda
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -profile conda
 ```
 
 #### **DOCKER**
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -profile docker
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -profile docker
 ```
 
 ---
@@ -126,7 +119,7 @@ abricate --datadir
 2. Copia el archivo `staph_vf.fasta`:
 
 ```bash
-cp TFM-Resvirpredictor/resources/staph_vf.fasta /pathtobd/staph/sequences
+cp StaPhyloRes/resources/staph_vf.fasta /pathtobd/staph/sequences
 
 abricate --setupdb
 ```
@@ -134,7 +127,7 @@ abricate --setupdb
 3. Ejecuta el pipeline:
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ --abricate_db true
 ```
 
 ---
@@ -149,7 +142,7 @@ https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
 Ejecuta el pipeline con la referencia de MASH:
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ --phylogeny true --mash_reference pathtomashreference.msh
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ --phylogeny true --mash_reference pathtomashreference.msh
 ```
 
 ---
@@ -191,7 +184,7 @@ nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -
   Puedes especificar un directorio de trabajo personalizado al ejecutar el pipeline usando la opción `-work-dir`.
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/ -work-dir /path/to/custom/workdir
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -work-dir /path/to/custom/workdir
 ```
 
 
@@ -220,5 +213,3 @@ This pipeline uses code and infrastructure developed and maintained by the [nf-c
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > Nat Biotechnol. 2020 Feb 13. doi: 10.1038/s41587-020-0439-x.
-
-In addition, references of tools and data used in this pipeline are as follows:
