@@ -61,7 +61,7 @@ Cada fila representa un par de archivos fastq (paired end).
 Crear un entorno de **Conda** a partir del archivo YML proporcionado:
 
 ```bash
-conda env create -f TFM-Resvirpredictor/resourses/resvirpredictor.yml --name env_name
+conda env create -f StaPhyloRes/resourses/resvirpredictor.yml --name env_name
 ```
 
 Activa el entorno:
@@ -75,7 +75,7 @@ conda activate env_name
 ## **Ejecución Básica**
 
 ```bash
-nextflow run TFM-Resvirpredictor/ --input samplesheet.csv --outdir outdirpath/
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/
 ```
 
 Este comando ejecutará el análisis, que incluye:
