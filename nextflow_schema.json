@@ -29,6 +29,13 @@
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "ariba_db_dir": {
+                "type": "string",
+                "format": "directory-path",
+                "description": "Path to the local directory containing pre-downloaded ARIBA database tarballs.",
+                "help_text": "Provide the absolute path to a folder holding prepared archives named exactly as 'vfdb_core.tar.gz', 'card.tar.gz', 'resfinder.tar.gz', and 'plasmidfinder.tar.gz' to bypass online steps.",
+                "fa_icon": "fas fa-folder"
+                },
                 "abricate_db": {
                     "type": "boolean",
                     "description": "It uses a custom database previously configured in a conda environment, under the name \"staph\".",
