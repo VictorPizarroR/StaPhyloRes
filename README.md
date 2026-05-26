@@ -107,7 +107,7 @@ nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -profile 
 
 ### Uso de una Base de Datos Offline de ARIBA
 
-El pipeline permite el uso de ARIBA de manera híbrida. En lugar de forzar la descarga ed las bases de datos mediante ARIBA_GETREF en cada ejecución, el pipeline evalúa la ruta entregada en la línea de comandos como primera opción.
+El pipeline permite el uso de ARIBA de manera híbrida. En lugar de forzar la descarga de las bases de datos mediante ARIBA_GETREF en cada ejecución, el pipeline evalúa la ruta entregada en la línea de comandos como primera opción.
 
 1. Descargar e indexar la base de datos de Ariba (Ejemplo VFDB):
 
@@ -130,7 +130,7 @@ ariba_local_dir/
 └── plasmidfinder.tar.gz
 ```
 
-3. Ejecuta el pipeline indicaando directorio local de Ariba:
+3. Ejecuta el pipeline indicando directorio local de Ariba:
 
 ```bash
 nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ --ariba_bd_dir ariba_local_dir/
