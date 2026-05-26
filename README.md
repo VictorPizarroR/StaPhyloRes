@@ -105,6 +105,37 @@ nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ -profile 
 
 ## **Análisis Opcionales y Complementarios**
 
+### Uso de una Base de Datos Offline de ARIBA
+
+El pipeline permite el uso de ARIBA de manera híbrida. En lugar de forzar la descarga ed las bases de datos mediante ARIBA_GETREF en cada ejecución, el pipeline evalúa la ruta entregada en la línea de comandos como primera opción.
+
+1. Descargar e indexar la base de datos de Ariba (Ejemplo VFDB):
+
+```bash
+ariba prepareref --all_coding yes -f VFDB_setA_nt.fas.gz vfdb_core
+```
+
+2. Comprimir carpeta resultante `"vfdb_core"` para mantener formato `"vfdb_core.tar.gz"`
+
+```bash
+tar -zcvf vfdb_core.tar.gz vfdb_core/
+```
+
+Estructura de directorio de bases de datos ARIBA:
+```bash
+ariba_local_dir/
+├── vfdb_core.tar.gz
+├── card.tar.gz
+├── resfinder.tar.gz
+└── plasmidfinder.tar.gz
+```
+
+3. Ejecuta el pipeline indicaando directorio local de Ariba:
+
+```bash
+nextflow run StaPhyloRes/ --input samplesheet.csv --outdir outdirpath/ --ariba_bd_dir ariba_local_dir/
+```
+
 ### Uso de una Base de Datos Personalizada
 
 El pipeline puede usar una base de datos personalizada, `"staph_vf.fasta"`, en el directorio `resources`. Para usarla:
